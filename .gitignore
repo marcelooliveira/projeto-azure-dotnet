@@ -411,3 +411,8 @@ FodyWeavers.xsd
 /MedVoll.Identity/AspIdUsers.db-wal
 /VollMed.Identity/AspIdUsers.db
 /VollMed.WebAPI/vollmed.db
+/VollMed.Identity/AspIdUsers.db-shm
+/VollMed.Identity/AspIdUsers.db-wal
+
+# Identity/keys
+is-signing-key-*
