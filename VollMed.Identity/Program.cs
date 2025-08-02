@@ -1,0 +1,58 @@
+// Copyright (c) Duende Software. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using Duende.IdentityServer;
+using VollMed.Identity;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+Log.Information("Starting up");
+
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Host.UseSerilog((ctx, lc) => lc
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
+        .Enrich.FromLogContext()
+        .ReadFrom.Configuration(ctx.Configuration));
+
+
+    builder.Services.AddAuthentication()
+    .AddGoogle("Google", options =>
+    {
+        options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme; // necessário para IdentityServer 
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        options.CallbackPath = "/signin-google"; // caminho padrão, deve bater com o Redirect URI no Google 
+    });
+
+
+    var app = builder
+        .ConfigureServices()
+        .ConfigurePipeline();
+
+    // this seeding is only for the template to bootstrap the DB and users.
+    // in production you will likely want a different approach.
+    if (args.Contains("/seed"))
+    {
+        Log.Information("Seeding database...");
+        SeedData.EnsureSeedData(app);
+        Log.Information("Done seeding database. Exiting.");
+        return;
+    }
+
+    app.Run();
+}
+catch (Exception ex) when (ex is not HostAbortedException)
+{
+    Log.Fatal(ex, "Unhandled exception");
+}
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
+}
