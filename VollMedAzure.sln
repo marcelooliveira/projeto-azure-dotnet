@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aulas", "Aulas", "{2D91AC3A-9314-4945-B475-C8D25ADC4C61}"
 	ProjectSection(SolutionItems) = preProject
 		Aula1.md = Aula1.md
+		Aula2.md = Aula2.md
 	EndProjectSection
 EndProject
 Global
