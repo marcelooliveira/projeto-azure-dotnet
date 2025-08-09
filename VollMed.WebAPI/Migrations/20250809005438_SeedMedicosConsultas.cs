@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
-namespace VollMed.Web.Data.Migrations
+namespace VollMed.WebAPI.Migrations
 {
     public partial class SeedMedicosConsultas : Migration
     {
@@ -12,7 +10,7 @@ namespace VollMed.Web.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Medicos",
                 columns: ["Nome", "Email", "Telefone", "Crm", "Especialidade"],
-                columnTypes: ["string", "string", "string", "string", "int"], 
+                columnTypes: ["string", "string", "string", "string", "int"],
                 values: new object[,]
                 {
                 { "Gregory House", "house@hospital.com", "(12)12345-6781", "123456", 6 }, // Diagnóstico
