@@ -4,6 +4,8 @@ using VollMed.Web.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
 //using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -103,6 +105,11 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 //        options.SaveTokens = true;
 //    });
 
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
+    .EnableTokenAcquisitionToCallDownstreamApi()
+    .AddDownstreamApi("VollMed.WebApi", builder.Configuration.GetSection("VollMed.WebApi"))
+    .AddInMemoryTokenCaches();
 
 var app = builder.Build();
 
