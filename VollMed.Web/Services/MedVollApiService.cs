@@ -8,16 +8,16 @@ namespace VollMed.Web.Services
     {
         class ApiUris
         {
-            public static string ListarConsultas = "/api/Consulta/listar";
-            public static string ObterFormularioConsulta = "/api/Consulta/formulario";
-            public static string SalvarConsulta = "/api/Consulta/Salvar";
-            public static string ExcluirConsulta = "/api/Consulta/Excluir";
+            public static string ListarConsultas = "api/Consulta/listar";
+            public static string ObterFormularioConsulta = "api/Consulta/formulario";
+            public static string SalvarConsulta = "api/Consulta/Salvar";
+            public static string ExcluirConsulta = "api/Consulta/Excluir";
 
-            public static string ListarMedicos = "/api/Medico/Listar";
-            public static string ObterFormularioMedico = "/api/Medico/formulario";
-            public static string SalvarMedico = "/api/Medico/Salvar";
-            public static string ExcluirMedico = "/api/Medico/Excluir";
-            public static string ListarMedicosPorEspecialidade = "/api/Medico/especialidade";
+            public static string ListarMedicos = "api/Medico/Listar";
+            public static string ObterFormularioMedico = "api/Medico/formulario";
+            public static string SalvarMedico = "api/Medico/Salvar";
+            public static string ExcluirMedico = "api/Medico/Excluir";
+            public static string ListarMedicosPorEspecialidade = "api/Medico/especialidade";
         }
 
         public VollMedApiService(

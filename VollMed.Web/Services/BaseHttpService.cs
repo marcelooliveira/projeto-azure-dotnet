@@ -78,7 +78,7 @@ namespace VollMed.Web.Services
         private async Task<HttpClient> GetHttpClientAsync()
         {
             HttpClient httpClient = _httpClientFactory.CreateClient(_configuration["VollMed.WebApi.Name"] ?? "");
-            await SetToken(httpClient);
+            //await SetToken(httpClient);
             return httpClient;
         }
 
