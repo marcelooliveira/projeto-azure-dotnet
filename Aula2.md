@@ -23,30 +23,36 @@ az account set --subscription "SUA_SUBSCRIPTION_ID"
 
 # 1. Registrar a aplicação cliente (VollMed.Web) no Azure AD
 #    É a aplicação que inicia o fluxo de login
-az ad app create \
-    --display-name "VollMed.Web" \
-    --sign-in-audience "AzureADMyOrg" \
-    --web-redirect-uris "https://localhost:5002/signin-oidc" "https://vollmed-web-app.azurewebsites.net/signin-oidc" \
-    --identifier-uris "api://vollmed-web" \
+az ad app create `
+    --display-name "VollMed.Web" `
+    --sign-in-audience "AzureADMyOrg" `
+    --web-redirect-uris "https://localhost:5002/signin-oidc" "https://vollmed-web-app.azurewebsites.net/signin-oidc" `
     --query appId --output tsv
 
 # Anote o appId retornado. Ele será o Client ID para VollMed.Web.
+# Adicione o identifier URI usando o App ID:
+
+    az ad app update --id <APP_ID> --identifier-uris "api://<APP_ID>"
+
 # Exemplo de saída: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 ```
 
+   
 ### 2\. Registro da Aplicação `VollMed.WebAPI` (API Protegida no Azure AD)
 
 A `VollMed.WebAPI` precisará ser registrada no Azure AD para que o Azure AD saiba que ela é um recurso protegido e possa emitir tokens para ela.
 
 ```bash
 # 2. Registrar a aplicação API (VollMed.WebAPI) no Azure AD
-az ad app create \
-    --display-name "VollMed.WebAPI" \
-    --identifier-uris "api://vollmed-webapi" \
+az ad app create `
+    --display-name "VollMed.WebAPI" `
     --query appId --output tsv
 
 # Anote o appId retornado. Ele será o Client ID da API.
 # Exemplo de saída: "ffffffff-gggg-hhhh-iiii-jjjjjjjjjjjj"
+# Adicione o identifier URI usando o App ID:
+
+    az ad app update --id <APP_ID> --identifier-uris "api://<APP_ID>"
 ```
 
 #### Expor uma Permissão (Scope) para a `VollMed.WebAPI`
@@ -55,7 +61,7 @@ Agora, vamos definir as permissões que a `VollMed.WebAPI` expõe, para que outras
 
 ```bash
 # Substitua pelo Client ID da VollMed.WebAPI que você anotou acima
-VollMedWebAPI_AppId="ffffffff-gggg-hhhh-iiii-jjjjjjjjjjjj"
+set VollMedWebAPI_AppId="13ca1ac7-2897-4f7d-8672-a572d484c8a3"
 
 # Expor a permissão "VollMed.WebAPI"
 az ad app permission add --id $VollMedWebAPI_AppId --api $VollMedWebAPI_AppId --api-permissions "user_impersonation=Scope"
@@ -110,24 +116,24 @@ YOUR_TENANT_ID=$(az account show --query tenantId --output tsv)
 
 # Configurar VollMed.Web (se for autenticar diretamente com Azure AD)
 # Caso contrário, essa configuração fica no VollMed.Identity
-az webapp config appsettings set --resource-group $RESOURCE_GROUP --name $WEB_APP_NAME --settings \
-    "Authentication:AzureAd:ClientId=$VollMedWeb_AppId" \
-    "Authentication:AzureAd:TenantId=$YOUR_TENANT_ID" \
-    "Authentication:AzureAd:Instance=https://login.microsoftonline.com/" \
-    "Authentication:AzureAd:CallbackPath=/signin-oidc" \
+az webapp config appsettings set --resource-group $RESOURCE_GROUP --name $WEB_APP_NAME --settings `
+    "Authentication:AzureAd:ClientId=$VollMedWeb_AppId" `
+    "Authentication:AzureAd:TenantId=$YOUR_TENANT_ID" `
+    "Authentication:AzureAd:Instance=https://login.microsoftonline.com/" `
+    "Authentication:AzureAd:CallbackPath=/signin-oidc" `
     "Authentication:AzureAd:Audience=$VollMedWebAPI_AppId" # Se for chamar a WebAPI com token do AAD
 
 # Configurar VollMed.WebAPI (para validar tokens do Azure AD)
-az webapp config appsettings set --resource-group $RESOURCE_GROUP --name $WEBAPI_APP_NAME --settings \
-    "Authentication:JwtBearer:Authority=https://sts.windows.net/$YOUR_TENANT_ID/" \
+az webapp config appsettings set --resource-group $RESOURCE_GROUP --name $WEBAPI_APP_NAME --settings `
+    "Authentication:JwtBearer:Authority=https://sts.windows.net/$YOUR_TENANT_ID/" `
     "Authentication:JwtBearer:Audience=api://vollmed-webapi" # ou o AppId da WebAPI
 
 # Configurar VollMed.Identity (para usar Azure AD como provedor externo para Duende IdentityServer)
 # Substitua "SUA_CHAVE_SECRETA_AZUREAD" pelo segredo do cliente gerado no Azure AD para VollMed.Identity (se for a abordagem)
-az webapp config appsettings set --resource-group $RESOURCE_GROUP --name $IDENTITY_APP_NAME --settings \
-    "Authentication:AzureAD:ClientId=CLIENT_ID_AZURE_AD_IDENTITY_APP" \
-    "Authentication:AzureAD:ClientSecret=SUA_CHAVE_SECRETA_AZUREAD" \
-    "Authentication:AzureAD:TenantId=$YOUR_TENANT_ID" \
+az webapp config appsettings set --resource-group $RESOURCE_GROUP --name $IDENTITY_APP_NAME --settings `
+    "Authentication:AzureAD:ClientId=CLIENT_ID_AZURE_AD_IDENTITY_APP" `
+    "Authentication:AzureAD:ClientSecret=SUA_CHAVE_SECRETA_AZUREAD" `
+    "Authentication:AzureAD:TenantId=$YOUR_TENANT_ID" `
     "Authentication:AzureAD:CallbackPath=/signin-azuread"
 ```
 
