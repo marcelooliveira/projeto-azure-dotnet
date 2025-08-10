@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
+using Microsoft.AspNetCore.Authentication.Cookies;
 //using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,8 +26,8 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddTransient<IVollMedApiService, VollMedApiService>();
 
-var httpClientName = builder.Configuration["VollMed.WebApi.Name"];
-var httpClientUrl = builder.Configuration["VollMed.WebApi.Url"];
+var httpClientName = builder.Configuration["VollMed.WebApi:Name"];
+var httpClientUrl = builder.Configuration["VollMed.WebApi:BaseAddress"];
 
 builder.Services.AddHttpClient(
     httpClientName,
@@ -105,7 +106,8 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 //        options.SaveTokens = true;
 //    });
 
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+builder.Services
+    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
     .EnableTokenAcquisitionToCallDownstreamApi()
     .AddDownstreamApi("VollMed.WebApi", builder.Configuration.GetSection("VollMed.WebApi"))
