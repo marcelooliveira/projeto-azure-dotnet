@@ -369,4 +369,71 @@
 
 075. Rodar MVC (local) + WebApi (cloud), e testar aplicação completa
 
+077. Ajustar configurações do MVC (local):
 
+trocar:
+
+```c#
+var httpClientName = builder.Configuration["VollMed.WebApi:Name"];
+var httpClientUrl = builder.Configuration["VollMed.WebApi:BaseAddress"];
+```
+
+por 
+
+```c#
+var httpClientName = builder.Configuration["VollMed_WebApi:Name"];
+var httpClientUrl = builder.Configuration["VollMed_WebApi:BaseAddress"];
+```
+
+trocar:
+
+```c#
+HttpClient httpClient = _httpClientFactory.CreateClient(_configuration["VollMed.WebApi:Name"] ?? "");
+```
+
+por 
+
+```c#
+HttpClient httpClient = _httpClientFactory.CreateClient(_configuration["VollMed_WebApi:Name"] ?? "");
+```
+
+Trocar:
+
+```c#
+public override string Scope => _configuration["VollMed.WebApi:Scope"];
+```
+
+por 
+
+```c#
+public override string Scope => _configuration["VollMed_WebApi:Scope"];
+```
+
+trocar:
+
+```json
+"VollMed.WebApi": {
+```
+
+por 
+
+```json
+"VollMed_WebApi": {
+```
+
+
+080. Publish Web (MVC)
+    - Criar perfil de publicação
+    - Publicar
+
+090. Abrir Portal Azure, localizar no App Service o Web App (MVC) "VollMedWeb2025xxxxxxxxx"
+    - Menu Settings > Environment variables > App Settings
+    - Adicionar:
+        - VollMed_WebApi__Name: VollMed.WebApi
+        - VollMed_WebApi__BaseAddress: https://vollmedwebapi20250810195450.azurewebsites.net
+        - VollMed_WebApi__Scope: <VAZIO>
+    - Reiniciar (restart) no Web App "VollMedWeb2025xxxxxxxxx"
+
+060. Abrir Web (MVC) do azure no navegador
+    - https://vollmedweb2025xxxxxxxxx.azurewebsites.net
+    - testar a aplicação completa

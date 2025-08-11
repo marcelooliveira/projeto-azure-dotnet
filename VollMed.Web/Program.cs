@@ -27,8 +27,8 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddTransient<IVollMedApiService, VollMedApiService>();
 
-var httpClientName = builder.Configuration["VollMed.WebApi:Name"];
-var httpClientUrl = builder.Configuration["VollMed.WebApi:BaseAddress"];
+var httpClientName = builder.Configuration["VollMed_WebApi:Name"];
+var httpClientUrl = builder.Configuration["VollMed_WebApi:BaseAddress"];
 
 builder.Services.AddHttpClient(
     httpClientName,
