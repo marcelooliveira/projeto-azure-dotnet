@@ -7,6 +7,7 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Logging;
 //using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -112,6 +113,21 @@ builder.Services
     .EnableTokenAcquisitionToCallDownstreamApi()
     .AddDownstreamApi("VollMed.WebApi", builder.Configuration.GetSection("VollMed.WebApi"))
     .AddInMemoryTokenCaches();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+// MinimumLevel: Trace will show *everything*
+builder.Logging.SetMinimumLevel(LogLevel.Trace);
+
+builder.Logging.AddFilter("Microsoft", LogLevel.Trace);
+builder.Logging.AddFilter("System.Net.Http", LogLevel.Trace);
+builder.Logging.AddFilter("Microsoft.Identity", LogLevel.Trace);
+builder.Logging.AddFilter("Microsoft.IdentityModel", LogLevel.Trace);
+builder.Logging.AddFilter("Microsoft.Identity.Web", LogLevel.Trace);
+
+IdentityModelEventSource.ShowPII = true;
 
 var app = builder.Build();
 

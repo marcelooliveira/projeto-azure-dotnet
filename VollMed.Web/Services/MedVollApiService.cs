@@ -22,8 +22,9 @@ namespace VollMed.Web.Services
 
         public VollMedApiService(
             IConfiguration configuration
-            , IHttpClientFactory httpClientFactory)
-            : base(configuration, httpClientFactory)
+            , IHttpClientFactory httpClientFactory
+            , ILogger<BaseHttpService> logger)
+            : base(configuration, httpClientFactory, logger)
         {
         }
 
