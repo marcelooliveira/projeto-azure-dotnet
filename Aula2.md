@@ -61,6 +61,8 @@
     
 040. Rodar WebAPI local, testar o swagger/index.html
 
+045. Rodar MVC + WebAPI, testar a aplicação completa
+
 050. Publish WebAPI
     - Criar perfil de publicação
     - Modificar .pubxml:
@@ -353,3 +355,18 @@
         "apiVersion": "2022-03-01"
     }
 ```
+
+070. Editar \VollMed.Web\appsettings.Development.json
+    - Ajustar BaseAddress para WebAPI (cloud)
+
+```json
+  "VollMed.WebApi": {
+    "Name": "VollMed.WebApi",
+    "BaseAddress": "https://vollmedwebapi20250810195450.azurewebsites.net",
+    "Scope": ""
+  }
+```
+
+075. Rodar MVC (local) + WebApi (cloud), e testar aplicação completa
+
+
