@@ -50,69 +50,14 @@ builder.Services.AddHttpClient(
         options.Retry.Delay = TimeSpan.FromSeconds(5); // Intervalo entre tentativas
     });
 
-//builder.Services.AddRateLimiter(options =>
-//{
-//    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-//        RateLimitPartition.GetFixedWindowLimiter(
-//            partitionKey: context.User?.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
-//            factory: partition => new FixedWindowRateLimiterOptions
-//            {
-//                PermitLimit = 5, // até 5 requisições
-//                Window = TimeSpan.FromSeconds(10), // por intervalo de 10 segundos
-//                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-//                QueueLimit = 0 // sem fila de espera
-//            }));
-
-//    options.OnRejected = async (context, cancellationToken) =>
-//    {
-//        await context.HttpContext.Response.WriteAsync(
-//            "Limite de taxa excedido. Por favor tente novamente mais tarde.",
-//            cancellationToken);
-//    };
-//});
-
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 //builder.Services
-//    .AddAuthentication(options =>
-//    {
-//        options.DefaultScheme = "Cookies";
-//        options.DefaultChallengeScheme = "oidc";
-//    })
-//    .AddCookie("Cookies", options =>
-//    {
-//        options.Cookie.Name = "VollMedAuthCookie";
-//        options.LoginPath = "/Account/Login";
-//        options.AccessDeniedPath = "/Account/AccessDenied";
-//        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-//        options.SlidingExpiration = true;
-//        options.Cookie.HttpOnly = true;
-//        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-//        options.Cookie.SameSite = SameSiteMode.Strict;
-//    })
-//    .AddOpenIdConnect("oidc", options =>
-//    {
-//        options.Authority = builder.Configuration["VollMed.Identity.Url"];
-//        options.ClientId = "VollMed.Web";
-//        options.ClientSecret = "secret";
-//        options.ResponseType = "code";
-
-//        options.Scope.Clear();
-//        options.Scope.Add("openid");
-//        options.Scope.Add("profile");
-//        options.Scope.Add("VollMed.WebAPI");
-
-//        options.GetClaimsFromUserInfoEndpoint = true;
-//        options.MapInboundClaims = false;
-//        options.SaveTokens = true;
-//    });
-
-builder.Services
-    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-    .EnableTokenAcquisitionToCallDownstreamApi()
-    .AddDownstreamApi("VollMed.WebApi", builder.Configuration.GetSection("VollMed.WebApi"))
-    .AddInMemoryTokenCaches();
+//    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+//    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
+//    .EnableTokenAcquisitionToCallDownstreamApi()
+//    .AddDownstreamApi("VollMed.WebApi", builder.Configuration.GetSection("VollMed.WebApi"))
+//    .AddInMemoryTokenCaches();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -131,8 +76,6 @@ IdentityModelEventSource.ShowPII = true;
 
 var app = builder.Build();
 
-//app.UseRateLimiter();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -147,8 +90,8 @@ app.UseStaticFiles();
 
 
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

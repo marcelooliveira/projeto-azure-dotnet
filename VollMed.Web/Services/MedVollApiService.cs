@@ -88,6 +88,6 @@ namespace VollMed.Web.Services
             return await GetAsync<IEnumerable<MedicoDto>>(uri);
         }
 
-        public override string Scope => "VollMed.WebAPI";
+        public override string Scope => _configuration["VollMed.WebApi:Scope"];
     }
 }
