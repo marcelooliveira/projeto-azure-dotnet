@@ -14,6 +14,8 @@
         - Build action: Content
         - Copy to output directory: Copy if newer
 
+011. Mudar porta local do projeto web para localhost:5001
+
 012. Modificar controllers VollMed.WebAPI, COMENTANDO atributo [Authorize] 
 
 020. criar grupo de recursos vollmed-rg
