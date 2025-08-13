@@ -65,7 +65,14 @@
 
 045. Rodar MVC + WebAPI, testar a aplicação completa
 
-050. Publish WebAPI
+050. Criar App Service Plan único para MVC + Web API
+    - Create App Service Plan
+    - region: Brazil South
+    - VollMedAppServicePlan
+    - Pricing Plan: Free F1
+
+051. Publish WebAPI
+    - App Service Plan único: VollMedAppServicePlan
     - Criar perfil de publicação
     - Modificar .pubxml:
         - <SiteUrlToLaunchAfterPublish>https://vollmedwebapixxxxxxx.azurewebsites.net/Swagger/index.html</SiteUrlToLaunchAfterPublish>
@@ -425,6 +432,7 @@ por
 
 
 080. Publish Web (MVC)
+    - App Service Plan único: VollMedAppServicePlan
     - Criar perfil de publicação
     - Publicar
 
