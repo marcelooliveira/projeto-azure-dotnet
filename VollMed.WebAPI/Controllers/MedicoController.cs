@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace VollMed.WebAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class MedicoController : ControllerBase

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace VollMed.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ConsultaController : ControllerBase

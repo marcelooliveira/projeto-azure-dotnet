@@ -18,7 +18,7 @@ namespace VollMed.Web.Data
                 await roleManager.CreateAsync(new IdentityRole(userRole));
             }
             // Cria os usuários
-            await CreateUserAsync(userManager, "alice@smith.com", "Al1c35m17h", userRole);
+            await CreateUserAsync(userManager, "alice@smith.com", "W6f9LGl,(WuQ?7($an", userRole);
             await CreateUserAsync(userManager, "bob@smith.com", "B0b5m17h", userRole);
 
             // Verifica e cria a função "Admin", se necessário

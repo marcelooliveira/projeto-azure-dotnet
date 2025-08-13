@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace VollMed.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("medicos")]
     public class MedicoController : BaseController
     {

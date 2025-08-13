@@ -12,13 +12,15 @@ namespace VollMed.Web.Services
 
     public abstract class BaseHttpService : IService, IBaseHttpService
     {
+        protected readonly ITokenAcquisition _tokenAcquisition;
         protected readonly IConfiguration _configuration;
         protected readonly IHttpClientFactory _httpClientFactory;
         protected readonly ILogger<BaseHttpService> _logger;
         protected HttpContext _httpContext = null;
 
-        public BaseHttpService(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<BaseHttpService> logger)
+        public BaseHttpService(ITokenAcquisition tokenAcquisition, IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<BaseHttpService> logger)
         {
+            _tokenAcquisition = tokenAcquisition;
             _configuration = configuration;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
@@ -98,6 +100,7 @@ namespace VollMed.Web.Services
         {
             HttpClient httpClient = _httpClientFactory.CreateClient(_configuration["VollMed_WebApi:Name"] ?? "");
             //await SetToken(httpClient);
+            await SetTokenAsync(httpClient);
             return httpClient;
         }
 
@@ -105,6 +108,15 @@ namespace VollMed.Web.Services
         {
             var accessToken = await _httpContext.GetTokenAsync("access_token");
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        }
+
+        private async Task SetTokenAsync(HttpClient httpClient)
+        {
+            string[] scopes = new[] { _configuration["VollMed_WebApi:Scope"] };
+
+            var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
         }
     }
 }

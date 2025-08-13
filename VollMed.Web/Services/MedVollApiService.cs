@@ -1,4 +1,5 @@
-﻿using VollMed.Web.Dtos;
+﻿using Microsoft.Identity.Web;
+using VollMed.Web.Dtos;
 using VollMed.Web.Interfaces;
 using VollMed.Web.Models;
 
@@ -21,10 +22,11 @@ namespace VollMed.Web.Services
         }
 
         public VollMedApiService(
-            IConfiguration configuration
+            ITokenAcquisition tokenAcquisition
+            , IConfiguration configuration
             , IHttpClientFactory httpClientFactory
             , ILogger<BaseHttpService> logger)
-            : base(configuration, httpClientFactory, logger)
+            : base(tokenAcquisition, configuration, httpClientFactory, logger)
         {
         }
 

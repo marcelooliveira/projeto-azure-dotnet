@@ -52,12 +52,12 @@ builder.Services.AddHttpClient(
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-//builder.Services
-//    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-//    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-//    .EnableTokenAcquisitionToCallDownstreamApi()
-//    .AddDownstreamApi("VollMed.WebApi", builder.Configuration.GetSection("VollMed.WebApi"))
-//    .AddInMemoryTokenCaches();
+builder.Services
+    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
+    .EnableTokenAcquisitionToCallDownstreamApi()
+    .AddDownstreamApi("VollMed.WebApi", builder.Configuration.GetSection("VollMed.WebApi"))
+    .AddInMemoryTokenCaches();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -90,8 +90,8 @@ app.UseStaticFiles();
 
 
 app.UseRouting();
-//app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
