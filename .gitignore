@@ -418,3 +418,7 @@ FodyWeavers.xsd
 is-signing-key-*
 /VollMed.WebAPI/vollmed.db-shm
 /VollMed.WebAPI/vollmed.db-wal
+/VollMed.Web/appsettings.Development.json
+/VollMed.Web/appsettings.json
+/VollMed.WebAPI/appsettings.Development.json
+/VollMed.WebAPI/appsettings.json
