@@ -1,4 +1,5 @@
-﻿using Microsoft.Identity.Web;
+﻿using Microsoft.Identity.Client;
+using Microsoft.Identity.Web;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
@@ -106,9 +107,19 @@ namespace VollMed.Web.Services
         {
             string[] scopes = [_configuration["VollMed_WebApi:Scope"]];
 
-            var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", accessToken);
+            try
+            {
+                // Tenta pegar o token silenciosamente (AcquireTokenSilent)
+                var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", accessToken);
+            }
+            catch (MsalUiRequiredException)
+            {
+                // Se não conseguir de forma silenciosa, redireciona para login
+                // (em API pode lançar para o middleware de autenticação tratar)
+                throw;
+            }
         }
     }
 }

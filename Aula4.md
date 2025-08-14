@@ -32,20 +32,23 @@
 
 1. **Novo registro** > Nome: `VollMed.Web`.
 2. Contas: “Somente contas neste diretório organizacional”.
-3. URI de redirecionamento:
+3. URI de redirecionamento (local):
+   * Tipo: Web
+   * URL: `https://localhost:5001/signin-oidc`
+4. URI de redirecionamento (cloud):
    * Tipo: Web
    * URL: `https://vollmedweb2025XXXXXXXXXXXXXX.azurewebsites.net/signin-oidc`
-4. Aba **Autenticação**:
+5. Aba **Autenticação**:
 
    * Abaixo de "Front-channel logout URL", adicionar URL de logout: `https://vollmedweb2025XXXXXXXXXXXXXX.azurewebsites.net/signout-callback-oidc`
    * Ativar “ID tokens” e “Access tokens”.
-5. **Permissões de API**:
+6. **Permissões de API**:
 
    * Adicionar > APIs my organization uses > `VollMed.WebAPI` > `vollmed_api.all` > Conceder consentimento do administrador.
    * Salvar
    * Clicar em "Grant admin consent for ..."
 
-6. Criar um secret: No app registration "VollMed.Web"
+7. Criar um secret: No app registration "VollMed.Web"
     * ao lado de "Client credentials" clique "add secret"
     * + new client secret
     * Description: secret
@@ -66,52 +69,69 @@
 
 ### Projeto VollMed.WebApi
 
+appsettings.Development.json
+
 ```json
+  "ConnectionStrings": {
+	"VollMedDB": "Server=tcp:vollmedxxxxxxxxxxx.database.windows.net,1433;Initial Catalog=VollMedDB;Persist Security Info=False;User ID=vollmed;Password=xxxxxxxx;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  },
   "AzureAd": {
-    "Instance": "https://login.microsoftonline.com/",
-    "Domain": "xxxxx.onmicrosoft.com",
-    "TenantId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "ClientId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "Audience": "api://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+	"Instance": "https://login.microsoftonline.com/",
+	"Domain": "xxxxxx.onmicrosoft.com",
+	"TenantId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+	"ClientId": "[CLIENT-ID-DO-APP-REGISTRATION-DO-API]",
+	"Audience": "api://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
   }
 ```
 
 ### Environment Variables - VollMedWebApi
 
+ConnectionStrings:
+
+```bash
+VollMedDB=Server=tcp:vollmedxxxxxxxxxxx.database.windows.net,1433;Initial Catalog=VollMedDB;Persist Security Info=False;User ID=vollmed;Password=xxxxxxxx;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+```
+
+App Settings:
+
 ```bash
 AzureAd__Instance=https://login.microsoftonline.com/
 AzureAd__Domain=xxxxx.onmicrosoft.com
 AzureAd__TenantId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-AzureAd__ClientId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AzureAd__ClientId=[CLIENT-ID-DO-APP-REGISTRATION-DO-API]
 AzureAd__Audience=api://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ### VollMed.Web
 
+appsettings.Development.json
+
 ```json
   "AzureAd": {
-    "Instance": "https://login.microsoftonline.com/",
-    "Domain": "xxxxxxxx.onmicrosoft.com",
-    "TenantId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "ClientId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "ClientSecret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "CallbackPath": "/signin-oidc"
+	"Instance": "https://login.microsoftonline.com/",
+	"Domain": "xxxxxx.onmicrosoft.com",
+	"TenantId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+	"ClientId": "[CLIENT-ID-DO-APP-REGISTRATION-DO-MVC]",
+	"ClientSecret": "[SECRET-DO-APP-REGISTRATION-DO-MVC]",
+	"CallbackPath": "/signin-oidc"
   },
   "VollMed_WebApi": {
-    "Name": "VollMed.WebApi",
-    "BaseAddress": "https://vollmedwebapixxxxxxxxxxxx.azurewebsites.net",
-    "Scope": "api://xxxxxxxxxxxxx/vollmed_api.all"
+	"Name": "VollMed.WebApi",
+	"BaseAddress": "https://localhost:6001",
+	"Scope": "api://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/vollmed_api.all"
   }
 ```
 
 ## Environment Variables - VollMed.Web
 
+App Settings:
+
 ```bash
 AzureAd__Instance=https://login.microsoftonline.com/
 AzureAd__Domain=xxxxxxxxxxx.onmicrosoft.com
 AzureAd__TenantId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-AzureAd__ClientId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-AzureAd__ClientSecret=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AzureAd__ClientId=[CLIENT-ID-DO-APP-REGISTRATION-DO-MVC]
+AzureAd__ClientSecret=[SECRET-DO-APP-REGISTRATION-DO-MVC]
 VollMed_WebApi__Name=VollMed.WebApi
 VollMed_WebApi__BaseAddress=https://vollmedwebapixxxxxxxxxxxx.azurewebsites.net
 VollMed_WebApi__Scope=api://xxxxxxxxxxxxx/vollmed_api.all
@@ -176,12 +196,21 @@ A ideia é passar o access token no cabeçalho das requisições:
 
         private async Task SetTokenAsync(HttpClient httpClient)
         {
-            // Pega o escopo configurado para a API
-            string[] scopes = new[] { _configuration["VollMed_WebApi:Scope"] };
+            string[] scopes = [_configuration["VollMed_WebApi:Scope"]];
 
-            var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
-            httpClient.DefaultRequestHeaders.Authorization = 
-                new AuthenticationHeaderValue("Bearer", accessToken);
+            try
+            {
+                // Tenta pegar o token silenciosamente (AcquireTokenSilent)
+                var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", accessToken);
+            }
+            catch (MsalUiRequiredException)
+            {
+                // Se não conseguir de forma silenciosa, redireciona para login
+                // (em API pode lançar para o middleware de autenticação tratar)
+                throw;
+            }
         }
 ```
 
