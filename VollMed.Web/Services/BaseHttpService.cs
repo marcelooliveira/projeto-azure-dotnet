@@ -1,8 +1,8 @@
-﻿using VollMed.Web.Interfaces;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.Identity.Web;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
+using VollMed.Web.Interfaces;
 
 namespace VollMed.Web.Services
 {
@@ -11,14 +11,18 @@ namespace VollMed.Web.Services
 
     public abstract class BaseHttpService : IService, IBaseHttpService
     {
+        protected readonly ITokenAcquisition _tokenAcquisition;
         protected readonly IConfiguration _configuration;
         protected readonly IHttpClientFactory _httpClientFactory;
+        protected readonly ILogger<BaseHttpService> _logger;
         protected HttpContext _httpContext = null;
 
-        public BaseHttpService(IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public BaseHttpService(ITokenAcquisition tokenAcquisition, IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<BaseHttpService> logger)
         {
+            _tokenAcquisition = tokenAcquisition;
             _configuration = configuration;
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         public abstract string Scope { get; }
@@ -33,8 +37,24 @@ namespace VollMed.Web.Services
             }
 
             using HttpClient httpClient = await GetHttpClientAsync();
+            
+            string json;
 
-            var json = await httpClient.GetStringAsync(requestUri);
+            try
+            {
+                json = await httpClient.GetStringAsync(requestUri);
+            }
+            catch (MicrosoftIdentityWebChallengeUserException ex)
+            {
+                _logger.LogError(ex, "Token acquisition failed for Web API");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error calling Web API");
+                throw;
+            }
+
             return JsonConvert.DeserializeObject<T>(json);
         }
 
@@ -77,15 +97,18 @@ namespace VollMed.Web.Services
 
         private async Task<HttpClient> GetHttpClientAsync()
         {
-            HttpClient httpClient = _httpClientFactory.CreateClient(_configuration["VollMed.WebApi.Name"] ?? "");
-            await SetToken(httpClient);
+            HttpClient httpClient = _httpClientFactory.CreateClient(_configuration["VollMed_WebApi:Name"] ?? "");
+            await SetTokenAsync(httpClient);
             return httpClient;
         }
 
-        private async Task SetToken(HttpClient httpClient)
+        private async Task SetTokenAsync(HttpClient httpClient)
         {
-            var accessToken = await _httpContext.GetTokenAsync("access_token");
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            string[] scopes = [_configuration["VollMed_WebApi:Scope"]];
+
+            var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
         }
     }
 }
