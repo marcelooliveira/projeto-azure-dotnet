@@ -42,15 +42,28 @@
             - Allow certain public internet IP addresses to access your resource: YES
             - Add current client IP address: YES
 
-032. ConnectionString nos arquivos appsettings.Development.json:
-    - \VollMed.Web\appsettings.Development.json
-        - Build action: Content
-        - Copy to output directory: Copy if newer
-    - \VollMed.WebAPI\appsettings.Development.json
-        - Build action: Content
-        - Copy to output directory: Copy if newer
-    
-040. Rodar WebAPI local, testar o swagger/index.html
+032. ConnectionString em VollMed.WebAPI
 
-045. Rodar MVC + WebAPI, testar a aplicação completa
+Arquivo appsettings.Development.json:
+
+```json
+  "ConnectionStrings": {
+    "VollMedDB": "Server=tcp:vollmed20250815.database.windows.net,1433;Initial Catalog=VollMedDB;Persist Security Info=False;User ID=vollmed;Password=**********;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  }
+```
+
+035. Criar esquema banco de dados + popular tabelas
+
+```console
+cd VollMed.WebAPI
+dotnet ef database update
+```
+    
+040. Rodar WebAPI local
+
+045. Rodar MVC + WebAPI, 
+
+046. testar o swagger/index.html
+
+047. testar a aplicação completa
 
