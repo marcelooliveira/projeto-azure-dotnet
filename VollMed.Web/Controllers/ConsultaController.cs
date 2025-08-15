@@ -1,11 +1,9 @@
-﻿using VollMed.Web.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using VollMed.Web.Dtos;
 using VollMed.Web.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace VollMed.Web.Controllers
 {
-    [Authorize]
     [Route("consultas")]
     public class ConsultaController : BaseController
     {

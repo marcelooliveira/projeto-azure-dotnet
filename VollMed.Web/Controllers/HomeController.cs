@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace VollMed.Web.Controllers
 {
@@ -24,12 +25,12 @@ namespace VollMed.Web.Controllers
         [HttpPost]
         public IActionResult Logout()
         {
-            return SignOut(new AuthenticationProperties
-            {
-                RedirectUri = "/"
-            },
-            "Cookies",     // Faz o sign-out do cookie local
-            "oidc");       // Faz o sign-out do provedor externo (OpenID Connect)
+            throw new NotImplementedException();
+            //return SignOut(
+            //    new AuthenticationProperties { RedirectUri = "/" },
+            //    OpenIdConnectDefaults.AuthenticationScheme,  // "OpenIdConnect"
+            //    CookieAuthenticationDefaults.AuthenticationScheme // "Cookies"
+            //);
         }
 
 
