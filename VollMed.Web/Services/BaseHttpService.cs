@@ -1,5 +1,4 @@
 ﻿using Microsoft.Identity.Client;
-using Microsoft.Identity.Web;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
@@ -12,15 +11,13 @@ namespace VollMed.Web.Services
 
     public abstract class BaseHttpService : IService, IBaseHttpService
     {
-        protected readonly ITokenAcquisition _tokenAcquisition;
         protected readonly IConfiguration _configuration;
         protected readonly IHttpClientFactory _httpClientFactory;
         protected readonly ILogger<BaseHttpService> _logger;
         protected HttpContext _httpContext = null;
 
-        public BaseHttpService(ITokenAcquisition tokenAcquisition, IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<BaseHttpService> logger)
+        public BaseHttpService(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<BaseHttpService> logger)
         {
-            _tokenAcquisition = tokenAcquisition;
             _configuration = configuration;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
@@ -44,11 +41,6 @@ namespace VollMed.Web.Services
             try
             {
                 json = await httpClient.GetStringAsync(requestUri);
-            }
-            catch (MicrosoftIdentityWebChallengeUserException ex)
-            {
-                _logger.LogError(ex, "Token acquisition failed for Web API");
-                throw;
             }
             catch (Exception ex)
             {
@@ -99,27 +91,7 @@ namespace VollMed.Web.Services
         private async Task<HttpClient> GetHttpClientAsync()
         {
             HttpClient httpClient = _httpClientFactory.CreateClient(_configuration["VollMed_WebApi:Name"] ?? "");
-            await SetTokenAsync(httpClient);
             return httpClient;
-        }
-
-        private async Task SetTokenAsync(HttpClient httpClient)
-        {
-            string[] scopes = [_configuration["VollMed_WebApi:Scope"]];
-
-            try
-            {
-                // Tenta pegar o token silenciosamente (AcquireTokenSilent)
-                var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
-                httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", accessToken);
-            }
-            catch (MsalUiRequiredException)
-            {
-                // Se não conseguir de forma silenciosa, redireciona para login
-                // (em API pode lançar para o middleware de autenticação tratar)
-                throw;
-            }
         }
     }
 }

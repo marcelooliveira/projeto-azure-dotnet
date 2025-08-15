@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace VollMed.Web.Controllers
 {
@@ -26,11 +25,12 @@ namespace VollMed.Web.Controllers
         [HttpPost]
         public IActionResult Logout()
         {
-            return SignOut(
-                new AuthenticationProperties { RedirectUri = "/" },
-                OpenIdConnectDefaults.AuthenticationScheme,  // "OpenIdConnect"
-                CookieAuthenticationDefaults.AuthenticationScheme // "Cookies"
-            );
+            throw new NotImplementedException();
+            //return SignOut(
+            //    new AuthenticationProperties { RedirectUri = "/" },
+            //    OpenIdConnectDefaults.AuthenticationScheme,  // "OpenIdConnect"
+            //    CookieAuthenticationDefaults.AuthenticationScheme // "Cookies"
+            //);
         }
 
 
