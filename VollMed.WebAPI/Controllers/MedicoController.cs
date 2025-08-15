@@ -1,13 +1,11 @@
-﻿using VollMed.Web.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using VollMed.Web.Dtos;
 using VollMed.Web.Exceptions;
 using VollMed.Web.Interfaces;
 using VollMed.Web.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace VollMed.WebAPI.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class MedicoController : ControllerBase

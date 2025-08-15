@@ -1,12 +1,9 @@
-﻿using VollMed.Web.Models;
-using VollMed.WebAPI.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using VollMed.Web.Models;
 
 namespace VollMed.Web.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<VollMedUser>
+    public class ApplicationDbContext : DbContext
     {
         public DbSet<Consulta> Consultas { get; set; }
         public DbSet<Medico> Medicos { get; set; }

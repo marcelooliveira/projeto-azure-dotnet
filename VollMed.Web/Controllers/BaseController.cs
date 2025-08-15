@@ -1,7 +1,6 @@
-﻿using VollMed.Web.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using VollMed.Web.Models;
 
 namespace VollMed.Web.Controllers
 {
