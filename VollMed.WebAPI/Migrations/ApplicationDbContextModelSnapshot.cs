@@ -178,7 +178,7 @@ namespace VollMed.WebAPI.Migrations
 
                     b.HasIndex("MedicoId");
 
-                    b.ToTable("consultas");
+                    b.ToTable("consultas", (string)null);
                 });
 
             modelBuilder.Entity("VollMed.Web.Models.Medico", b =>
@@ -223,7 +223,7 @@ namespace VollMed.WebAPI.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("medicos");
+                    b.ToTable("medicos", (string)null);
                 });
 
             modelBuilder.Entity("VollMed.WebAPI.Models.VollMedUser", b =>
