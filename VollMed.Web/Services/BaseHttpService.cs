@@ -1,6 +1,4 @@
-﻿using Microsoft.Identity.Client;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
+﻿using Newtonsoft.Json;
 using System.Text;
 using VollMed.Web.Interfaces;
 
