@@ -26,18 +26,21 @@
         - Build action: Content
         - Copy to output directory: Copy if newer
 
-020. criar grupo de recursos vollmed-rg
+020. criar grupo de recursos
 030. criar banco de dados Azure Sql Database
     - Banco: VollMedDB
     - Servidor: vollmed20250808
     - SO: linux
     - mínimo de hardware
-    - autenticação sql com usuário e senha
-    - > Security > Networking
+    - autenticação sql com usuário e senha:
+        - vollmed
+        - !v0llmed
+    - Connectivity method:
+        - Public Endpoint
+    - Networking
         - Firewall rules
-            - Allow certain public internet IP addresses to access your resource
-            - Clique "Add your client IPv4 address to access your resource"
-            - Confirme o IP que aparece
+            - Allow certain public internet IP addresses to access your resource: YES
+            - Add current client IP address: YES
 
 032. ConnectionString nos arquivos appsettings.Development.json:
     - \VollMed.Web\appsettings.Development.json
