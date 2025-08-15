@@ -3,13 +3,18 @@ using VollMed.Web.Interfaces;
 using VollMed.Web.Repositories;
 using VollMed.Web.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-var connectionString = builder.Configuration.GetConnectionString("SqliteConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(x => x.UseSqlite(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>((options) => {
+    options
+            .UseSqlServer(builder.Configuration["ConnectionStrings:VollMedDB"],
+                b => b.MigrationsAssembly("VollMed.WebAPI"));
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -19,29 +24,27 @@ builder.Services.AddTransient<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddTransient<IMedicoService, MedicoService>();
 builder.Services.AddTransient<IConsultaService, ConsultaService>();
 
-builder.Services.AddAuthentication()
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(options =>
     {
-        options.Authority = "https://localhost:5001";
-        options.Audience = "https://localhost:5001/resources";
-        options.TokenValidationParameters.ValidateAudience = true;
+        builder.Configuration.Bind("AzureAd", options);
+    },
+    options =>
+    {
+        builder.Configuration.Bind("AzureAd", options);
     });
 
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("ApiScope", policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", "VollMed.WebAPI");
-    });
+builder.Services.AddAuthorization();
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 

@@ -1,8 +1,7 @@
-﻿using VollMed.Web.Models;
-using VollMed.WebAPI.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using VollMed.Web.Models;
+using VollMed.WebAPI.Models;
 
 namespace VollMed.Web.Data
 {
