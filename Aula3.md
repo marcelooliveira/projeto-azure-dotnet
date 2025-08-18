@@ -12,12 +12,6 @@
 
 # Aula 3
 
-050. Criar App Service Plan único para MVC + Web API
-    - Create App Service Plan
-    - region: Brazil South
-    - VollMedAppServicePlan
-    - Pricing Plan: Free F1
-
 051. Publish WebAPI
     - App Service Plan único: VollMedAppServicePlan
     - Criar perfil de publicação

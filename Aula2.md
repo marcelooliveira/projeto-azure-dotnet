@@ -52,6 +52,15 @@ Arquivo appsettings.Development.json:
   }
 ```
 
+033. Habilitar acesso ao banco
+
+- Portal Azure > VollMedDB > Query editor
+- Tentar login com usuário e senha
+- Verificar erro no firewall: Cannot open server 'vollmed2025xxxx' requested by the login. Client with IP address 'xxx.xxx.xxx.xxx' is not allowed ...
+- Clicar no link logo abaixo: Allowlist IP xxx.xxx.xxx.xxx on server vollmed2025xxxx
+- 
+
+
 035. Criar esquema banco de dados + popular tabelas
 
 ```console
