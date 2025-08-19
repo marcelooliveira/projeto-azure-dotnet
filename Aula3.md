@@ -19,10 +19,16 @@
     - Pricing Plan: Free F1
 
 051. Publish WebAPI
-    - App Service Plan único: VollMedAppServicePlan
+    - Azure
+    - Azure App Service (Linux)
     - Criar perfil de publicação
     - Modificar .pubxml:
         - <SiteUrlToLaunchAfterPublish>https://vollmedwebapixxxxxxx.azurewebsites.net/Swagger/index.html</SiteUrlToLaunchAfterPublish>
+    - Publish (Generates pubxml file)
+    - App Service:
+        - Name: VollMedWebAPI2025xxxxxxxxxxxx
+        - Resource group: vollmed-rg
+        - Hosting Plan: VollMedWebAPI2025xxxxxxxxxxx
     - Publicar
 
 052. Abrir Portal Azure, localizar  Azure Sql Database "vollmed20250808/VollMedDB"
@@ -39,4 +45,22 @@
 
 060. Abrir WebAPI do azure no navegador
     - https://vollmedwebapixxxxxxx.azurewebsites.net/Swagger/index.html
+
+061. Publish Web
+    - Azure
+    - Azure App Service (Linux)
+    - Publish (Generates pubxml file)
+    - App Service:
+        - Name: VollMedWeb2025xxxxxxxxxxxx
+        - Resource group: vollmed-rg
+        - Hosting Plan: VollMedWebAPI2025xxxxxxxxxxx
+    - Publicar
+
+062. Apontar MVC (cloud) para WEB API (cloud)
+    - No App Service do MVC, editar environment variables
+    - Adicionar chaves e valores:
+        - VollMed_WebApi__Name: VollMed.WebApi
+        - VollMed_WebApi__BaseAddress: URL do Web API (cloud)
+    - Fazer restart na aplicação MVC (cloud)
+
 
