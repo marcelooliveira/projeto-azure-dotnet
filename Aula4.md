@@ -12,6 +12,11 @@
 
 # Aula 4
 
+060. Parar as aplicações
+
+    * Parar Vollmed.WebAPI
+    * Parar Vollmed.Web
+
 070. Registrar apps no MS Entra ID:
 
 ### **Passo 1 – Registrar a Web API no Entra ID**
@@ -72,9 +77,6 @@
 appsettings.Development.json
 
 ```json
-  "ConnectionStrings": {
-	"VollMedDB": "Server=tcp:vollmedxxxxxxxxxxx.database.windows.net,1433;Initial Catalog=VollMedDB;Persist Security Info=False;User ID=vollmed;Password=xxxxxxxx;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-  },
   "AzureAd": {
 	"Instance": "https://login.microsoftonline.com/",
 	"Domain": "xxxxxx.onmicrosoft.com",
@@ -85,12 +87,6 @@ appsettings.Development.json
 ```
 
 ### Environment Variables - VollMedWebApi
-
-ConnectionStrings:
-
-```bash
-VollMedDB=Server=tcp:vollmedxxxxxxxxxxx.database.windows.net,1433;Initial Catalog=VollMedDB;Persist Security Info=False;User ID=vollmed;Password=xxxxxxxx;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
-```
 
 App Settings:
 
@@ -132,17 +128,19 @@ AzureAd__Domain=xxxxxxxxxxx.onmicrosoft.com
 AzureAd__TenantId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 AzureAd__ClientId=[CLIENT-ID-DO-APP-REGISTRATION-DO-MVC]
 AzureAd__ClientSecret=[SECRET-DO-APP-REGISTRATION-DO-MVC]
-VollMed_WebApi__Name=VollMed.WebApi
-VollMed_WebApi__BaseAddress=https://vollmedwebapixxxxxxxxxxxx.azurewebsites.net
 VollMed_WebApi__Scope=api://xxxxxxxxxxxxx/vollmed_api.all
 ```
 
 ## 2. Ativar `[Authorize]` nos Controllers
 
+`VollMed.Web/Controllers/ConsultaController.cs`
+
 ```csharp
-// Antes:
-//[Authorize]
-// Depois:
+[Authorize]
+```
+`VollMed.Web/Controllers/MedicoController.cs`
+
+```csharp
 [Authorize]
 ```
 
@@ -153,16 +151,15 @@ Remova o comentário da anotação `[Authorize]` nos controllers para exigir autent
 
 ## 3. Configurar autenticação e autorização no Web (MVC)
 
-```csharp
-// Antes:
-//builder.Services
-//    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-//    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-//    .EnableTokenAcquisitionToCallDownstreamApi()
-//    .AddDownstreamApi("VollMed.WebApi", builder.Configuration.GetSection("VollMed.WebApi"))
-//    .AddInMemoryTokenCaches();
 
-// Depois:
+```powershell
+cd VollMed.Web
+dotnet add package Microsoft.AspNetCore.Authentication.OpenIdConnect
+dotnet add package Microsoft.Identity.Web
+dotnet add package Microsoft.Identity.Web.DownstreamApi
+```
+
+```csharp
 builder.Services
     .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
@@ -218,12 +215,9 @@ A ideia é passar o access token no cabeçalho das requisições:
 
 ## 4. Ativar autenticação e autorização no pipeline
 
-```csharp
-// Antes:
-//app.UseAuthentication();
-//app.UseAuthorization();
+Depois de `app.UseRouting();`
 
-// Depois:
+```csharp
 app.UseAuthentication();
 app.UseAuthorization();
 ```
@@ -236,9 +230,6 @@ Garanta que o middleware de autenticação e autorização está ativo na aplicação.
 ## 5. Ativar `[Authorize]` nos Controllers da WebAPI
 
 ```csharp
-// Antes:
-//[Authorize]
-// Depois:
 [Authorize]
 ```
 
@@ -249,18 +240,16 @@ Exija autenticação para acessar rotas da API, protegendo endpoints sensíveis.
 
 ## 6. Configurar autenticação JWT na WebAPI
 
-```csharp
-// Antes:
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddMicrosoftIdentityWebApi(options => {
-//        builder.Configuration.Bind("AzureAd", options);
-//    },
-//    options => {
-//        builder.Configuration.Bind("AzureAd", options);
-//    });
-//builder.Services.AddAuthorization();
+```powershell
+cd ..
 
-// Depois:
+cd VollMed.WebAPI
+
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+dotnet add package Microsoft.Identity.Web
+```
+
+```csharp
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(options => {
         builder.Configuration.Bind("AzureAd", options);
@@ -276,9 +265,12 @@ Configure autenticação JWT usando MS Entra ID para proteger a WebAPI, vinculando
 
 
 
-090. Republicar os apps
+090. Reiniciar os apps
 
-    * Publish Vollmed.WebAPI
-    * Publish Vollmed.Web
+    * Iniciar Vollmed.WebAPI
+    * Iniciar Vollmed.Web
+    * Abrir aplicação Vollmed.Web
+    * Aguardar alguns minutos
+    * Se houver erro, tentar novamente algumas vezes
 
 
