@@ -38,16 +38,46 @@ namespace VollMed.WebAPI.Migrations
 
             // Populando a tabela Consultas com associações fictícias com a tabela Medicos
             migrationBuilder.InsertData(
-                table: "Consultas",
-                columns: ["MedicoId", "Paciente", "Data"],
-                columnTypes: ["int", "string", "DateTime"],
-                values: new object[,]
-                {
-                { 1, "12345678901", new DateTime(2024, 11, 10, 10, 0, 0) },
-                { 1, "23456789012", new DateTime(2024, 11, 11, 12, 0, 0) },
-                { 2, "34567890123", new DateTime(2024, 11, 12, 9, 0, 0) },
-                    // Adicione mais 17 registros fictícios
-                });
+            table: "Consultas",
+            columns: ["MedicoId", "Paciente", "Data"],
+            columnTypes: ["int", "string", "DateTime"],
+            values: new object[,]
+            {
+                { 1, "38492017562", new DateTime(2025, 5, 3, 9, 0, 0) },
+                { 2, "92837461502", new DateTime(2025, 5, 7, 13, 0, 0) },
+                { 3, "10293847561", new DateTime(2025, 5, 12, 15, 0, 0) },
+                { 4, "56473829104", new DateTime(2025, 5, 15, 9, 0, 0) },
+                { 5, "84736291028", new DateTime(2025, 5, 20, 13, 0, 0) },
+                { 6, "29384756109", new DateTime(2025, 5, 25, 15, 0, 0) },
+                { 7, "47583920176", new DateTime(2025, 5, 30, 9, 0, 0) },
+                { 8, "91827364501", new DateTime(2025, 6, 2, 13, 0, 0) },
+                { 9, "38475619203", new DateTime(2025, 6, 7, 15, 0, 0) },
+                { 10, "56473829105", new DateTime(2025, 6, 12, 9, 0, 0) },
+                { 1, "84736291029", new DateTime(2025, 6, 17, 13, 0, 0) },
+                { 2, "29384756110", new DateTime(2025, 6, 22, 15, 0, 0) },
+                { 3, "47583920177", new DateTime(2025, 6, 27, 9, 0, 0) },
+                { 4, "91827364502", new DateTime(2025, 7, 2, 13, 0, 0) },
+                { 5, "38475619204", new DateTime(2025, 7, 7, 15, 0, 0) },
+                { 6, "56473829106", new DateTime(2025, 7, 12, 9, 0, 0) },
+                { 7, "84736291030", new DateTime(2025, 7, 17, 13, 0, 0) },
+                { 8, "29384756111", new DateTime(2025, 7, 22, 15, 0, 0) },
+                { 1, "38475619205", new DateTime(2025, 8, 7, 15, 0, 0) },
+                { 2, "56473829107", new DateTime(2025, 8, 12, 9, 0, 0) },
+                { 3, "84736291031", new DateTime(2025, 8, 17, 13, 0, 0) },
+                { 4, "29384756112", new DateTime(2025, 8, 22, 15, 0, 0) },
+                { 5, "47583920179", new DateTime(2025, 8, 27, 9, 0, 0) },
+                { 6, "91827364504", new DateTime(2025, 9, 2, 13, 0, 0) },
+                { 1, "47583920180", new DateTime(2025, 9, 27, 9, 0, 0) },
+                { 2, "91827364505", new DateTime(2025, 10, 2, 13, 0, 0) },
+                { 3, "38475619207", new DateTime(2025, 10, 7, 15, 0, 0) },
+                { 4, "56473829109", new DateTime(2025, 10, 12, 9, 0, 0) },
+                { 5, "84736291033", new DateTime(2025, 10, 17, 13, 0, 0) },
+                { 10, "56473829110", new DateTime(2025, 5, 5, 9, 0, 0) },
+                { 1, "84736291034", new DateTime(2025, 5, 10, 13, 0, 0) },
+                { 2, "29384756115", new DateTime(2025, 5, 15, 15, 0, 0) },
+                { 3, "47583920182", new DateTime(2025, 5, 20, 9, 0, 0) },
+                { 4, "91827364507", new DateTime(2025, 5, 25, 13, 0, 0) }
+            });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
