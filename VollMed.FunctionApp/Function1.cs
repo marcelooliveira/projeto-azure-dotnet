@@ -29,7 +29,7 @@ public class Function1
         "SELECT m.Id as MedicoId, m.Nome as MedicoNome, COUNT(c.Id) as QtdeConsultas" +
         " FROM  Medicos m" +
         " LEFT JOIN Consultas c ON m.Id = c.MedicoId AND YEAR(c.Data) = @Ano AND MONTH(c.Data) = @Mes" +
-        " WHERE m.Id = 1" +
+        " WHERE m.Id = @MedicoId" +
         " GROUP BY m.Id , m.Nome",
         "SqlConnectionString", System.Data.CommandType.Text, "@MedicoId={MedicoId},@Ano={Ano},@Mes={Mes}")]
         IEnumerable<ConsultaPorMedico> consultas,
