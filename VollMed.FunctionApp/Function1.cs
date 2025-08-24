@@ -63,7 +63,8 @@ public class Function1
                         ano: consultaMsg.Ano,
                         mes: consultaMsg.Mes,
                         qtdeConsultas: consulta.QtdeConsultas + 1,
-                        honorarios: honorarios
+                        honorarios: honorarios,
+                        geradoParaCiCd: "conteúdo demonstrando publicação por CI/CD com GitHub Actions"
                     );
 
             var result = await container.UpsertItemAsync<ResultadoMensal>(
@@ -104,4 +105,5 @@ public record ResultadoMensal
     int mes,
     int qtdeConsultas,
     decimal honorarios
+    string geradoParaCiCd
 );

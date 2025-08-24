@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aulas", "Aulas", "{2D91AC3A
 		Aula4.md = Aula4.md
 		Aula5.md = Aula5.md
 		Aula6.md = Aula6.md
+		Aula7.md = Aula7.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VollMed.FunctionApp", "VollMed.FunctionApp\VollMed.FunctionApp.csproj", "{778DB905-9746-44A3-950B-0B615BB7354A}"
