@@ -104,6 +104,6 @@ public record ResultadoMensal
     int ano,
     int mes,
     int qtdeConsultas,
-    decimal honorarios
+    decimal honorarios,
     string geradoParaCiCd
 );
