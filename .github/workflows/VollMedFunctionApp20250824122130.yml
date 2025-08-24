@@ -1,4 +1,4 @@
-name: Build and deploy .NET Core application to Function App VollMedFunctionApp20250824122130
+name: CI/CD Pipeline for Function App
 on:
   push:
     branches:
