@@ -1,20 +1,9 @@
-﻿using System;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Configuration;
-using System.Security.Cryptography;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
-using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Serialization.HybridRow.Schemas;
+﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.Sql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace VollMed.FunctionApp;
 
@@ -31,21 +20,7 @@ public class Function1
         _cosmosClient = client;
     }
 
-    //[Function(nameof(Function1))]
-    //public async Task Run(
-    //    [ServiceBusTrigger("vollmedqueue", Connection = "ServiceBusConnection")]
-    //    ServiceBusReceivedMessage message,
-    //    ServiceBusMessageActions messageActions)
-    //{
-    //    _logger.LogInformation("Message ID: {id}", message.MessageId);
-    //    _logger.LogInformation("Message Body: {body}", message.Body);
-    //    _logger.LogInformation("Message Content-Type: {contentType}", message.ContentType);
-
-    //    // Complete the message
-    //    await messageActions.CompleteMessageAsync(message);
-    //}
-
-    [Function(nameof(Function1))]
+    [Function("ResumoMensalFunction")]
     public async Task Run(
         [ServiceBusTrigger("vollmedqueue", Connection = "ServiceBusConnection")]
         string message,
@@ -68,13 +43,9 @@ public class Function1
 
             Database database = _cosmosClient.GetDatabase(_configuration["AzureCosmosDB_DatabaseName"]);
 
-            //database = await database.ReadAsync();
-
             Microsoft.Azure.Cosmos.Container container = database.GetContainer(_configuration["AzureCosmosDB_ContainerName"]);
 
             container = await container.ReadContainerAsync();
-
-            //var tableClient = new TableClient(_configuration["AzureCosmosDB:TableStorageConnectionString"], "ResumoMensalConsultas");
 
             var consultaMsg = JsonSerializer.Deserialize<ConsultaQueueMessage>(message);
             _logger.LogInformation($"Processing consulta for MedicoId={consultaMsg.MedicoId}, Ano={consultaMsg.Ano}, Mes={consultaMsg.Mes}");
@@ -102,28 +73,8 @@ public class Function1
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to process consulta");
-
-            // ❌ Don't complete the message, let it be retried or dead-lettered
-            //await messageActions.AbandonMessageAsync(message);
         }
-
-
     }
-
-    //[Function(nameof(Function1))]
-    //public void Run(
-    //[ServiceBusTrigger("vollmedqueue", Connection = "ServiceBusConnection")] string message,
-    //[SqlInput("SELECT * FROM Consultas WHERE Id = @id", "SqlConnectionString", System.Data.CommandType.Text,
-    //    "@Id={medicoId}")]
-    //IEnumerable<Consulta> sqlInputData,
-    //ILogger log)
-    //{
-    //    //log.LogInformation($"Received message from Service Bus: {myQueueItem}");
-    //    //foreach (var item in sqlInputData)
-    //    //{
-    //    //    log.LogInformation($"SQL Input data item: {item.YourProperty}");
-    //    //}
-    //}
 
 }
 
