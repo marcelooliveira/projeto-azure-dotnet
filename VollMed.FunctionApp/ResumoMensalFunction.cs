@@ -1,19 +1,20 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.Sql;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace VollMed.FunctionApp;
 
-public class Function1
+public class ResumoMensalFunction
 {
-    private readonly ILogger<Function1> _logger;
+    private readonly ILogger<ResumoMensalFunction> _logger;
     private readonly IConfiguration _configuration;
     private readonly CosmosClient _cosmosClient;
 
-    public Function1(ILogger<Function1> logger, IConfiguration configuration, CosmosClient client)
+    public ResumoMensalFunction(ILogger<ResumoMensalFunction> logger, IConfiguration configuration, CosmosClient client)
     {
         _logger = logger;
         _configuration = configuration;
@@ -21,6 +22,7 @@ public class Function1
     }
 
     [Function("ResumoMensalFunction")]
+    [FunctionName("ResumoMensalFunction")]
     public async Task Run(
         [ServiceBusTrigger("vollmedqueue", Connection = "ServiceBusConnection")]
         string message,
