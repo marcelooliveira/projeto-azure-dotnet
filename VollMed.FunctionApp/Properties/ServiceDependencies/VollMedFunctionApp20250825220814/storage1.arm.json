@@ -4,7 +4,7 @@
   "parameters": {
     "resourceGroupName": {
       "type": "string",
-      "defaultValue": "vollmed-rg",
+      "defaultValue": "cloud-shell-storage-eastus",
       "metadata": {
         "_parameterType": "resourceGroup",
         "description": "Name of the resource group for the resource. It is recommended to put resources under same resource group for better tracking."
@@ -36,7 +36,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('VollMedFunctionApp20250824122130', subscription().subscriptionId)))]",
+      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('cs210032001a3b8a496', subscription().subscriptionId)))]",
       "resourceGroup": "[parameters('resourceGroupName')]",
       "apiVersion": "2019-10-01",
       "dependsOn": [
@@ -49,12 +49,15 @@
           "contentVersion": "1.0.0.0",
           "resources": [
             {
-              "kind": "web",
-              "name": "VollMedFunctionApp20250824122130",
-              "type": "microsoft.insights/components",
+              "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+              },
+              "kind": "StorageV2",
+              "name": "cs210032001a3b8a496",
+              "type": "Microsoft.Storage/storageAccounts",
               "location": "[parameters('resourceLocation')]",
-              "properties": {},
-              "apiVersion": "2015-05-01"
+              "apiVersion": "2017-10-01"
             }
           ]
         }
@@ -62,6 +65,6 @@
     }
   ],
   "metadata": {
-    "_dependencyType": "appInsights.azure"
+    "_dependencyType": "storage.azure"
   }
 }
