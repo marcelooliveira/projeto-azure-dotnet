@@ -9,6 +9,7 @@ env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 9.0.x
   WORKING_DIRECTORY: VollMed.FunctionApp
+  DOTNET_CORE_VERSION_INPROC: 6.0.x
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,6 +19,11 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+    - name: Setup .NET Core (for inproc extensions)
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION_INPROC }}
+        include-prerelease: True
     - name: Restore
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
     - name: Build
