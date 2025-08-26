@@ -40,3 +40,4 @@ jobs:
         with:
           app-name: 'VollMedFunctionApp20250825234440'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AE1F23042F55406DA26BB45EA73AEBCB }}
