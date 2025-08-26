@@ -28,6 +28,11 @@ jobs:
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           dotnet build --configuration Release --output ./output
           popd
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.VollMedFunctionApp20250825223107_SPN }}
       
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
