@@ -32,13 +32,13 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          creds: secrets.VOLLMEDFUNCTIONAPP20250825223107_SPN
+          creds: ${{ secrets.VollMedFunctionApp20250825234440_SPN }}
       
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
         with:
-          app-name: 'VollMedFunctionApp20250825223107'
+          app-name: 'VollMedFunctionApp20250825234440'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_2a38779e415c4abba11eede37c44f7f6 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AE1F23042F55406DA26BB45EA73AEBCB }}
