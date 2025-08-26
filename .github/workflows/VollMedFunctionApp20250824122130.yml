@@ -7,7 +7,7 @@ env:
   AZURE_FUNCTIONAPP_NAME: VollMedFunctionApp20250824122130
   AZURE_FUNCTIONAPP_PACKAGE_PATH: VollMed.FunctionApp/published
   CONFIGURATION: Release
-  DOTNET_CORE_VERSION: 9.0.x
+  DOTNET_CORE_VERSION: 6.0.x
   WORKING_DIRECTORY: VollMed.FunctionApp
   DOTNET_CORE_VERSION_INPROC: 6.0.x
 jobs:
@@ -30,6 +30,8 @@ jobs:
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Publish
       run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+    - name: List published files
+      run: ls -R ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
