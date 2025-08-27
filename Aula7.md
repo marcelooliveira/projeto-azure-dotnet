@@ -31,7 +31,7 @@ Variáveis de Ambiente
 
 ```yml
 env:
-  AZURE_FUNCTIONAPP_NAME: VollMedFunctionApp20250824122130
+  AZURE_FUNCTIONAPP_NAME: VollMedFunctionApp20250826204006
   AZURE_FUNCTIONAPP_PACKAGE_PATH: VollMed.FunctionApp/published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 9.0.x
@@ -65,7 +65,15 @@ Configurar o SDK do .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+    - name: Setup .NET Core (for inproc extensions)
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION_INPROC }}
+        include-prerelease: True
 ```
+
+## IMPORTANTE: colocar o @ acima, substituindo setup-dotnetv4 por setup-dotnet@v4
+
 
 Explicação:
 Este passo instala o SDK do .NET 9, necessário para compilar o projeto.
@@ -75,7 +83,6 @@ Restaurar Dependências
 ```yml
     - name: Restore
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
-
 ```
 
 Explicação:
@@ -96,7 +103,6 @@ Publicar o Projeto
 ```yml
     - name: Publish
       run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
-
 ```
 
 Explicação:
@@ -110,7 +116,10 @@ Salvar os Artefatos do Build
       with:
         name: functionapp
         path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        include-hidden-files: true
 ```
+
+## IMPORTANTE: A LINHA `include-hidden-files: true` ACIMA DEVE SER INCLUÍDA, CASO CONTRÁRIO O CI/CD NÃO IRÁ ENCONTRAR NEM PUBLICAR AS FUNÇÕES!
 
 Explicação:
 Salva os arquivos publicados para serem usados no próximo job (deploy).
@@ -129,12 +138,12 @@ O job de deploy também roda em Ubuntu e só começa após o job de build terminar.
 Baixar os Artefatos do Build
 
 ```yml
+    steps:
     - name: Download artifact from build job
       uses: actions/download-artifact@v4
       with:
         name: functionapp
         path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-
 ```
 
 Explicação:
@@ -147,8 +156,7 @@ Login no Azure
     - name: Azure Login
       uses: azure/login@v2
       with:
-        creds: ${{ secrets.VollMedFunctionApp20250824122130_SPN }}
-
+        creds: ${{ secrets.VollMedFunctionApp20250826204006_SPN }}
 ```
 
 Explicação:
@@ -162,7 +170,6 @@ Deploy na Azure Function App
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-
 ```
 
 Explicação:
