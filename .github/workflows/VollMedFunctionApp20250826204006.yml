@@ -29,3 +29,4 @@ jobs:
           app-name: 'VollMed.FunctionApp'
           package: './publish'
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
