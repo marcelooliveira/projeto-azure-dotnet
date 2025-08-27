@@ -174,9 +174,21 @@ Deploy na Azure Function App
 
 Explicação:
 Envia e publica os arquivos para a Function App especificada no Azure.
+
+### Publicar as Environment Variables no Azure Function App no portal do Azure
+
+```console
+"ServiceBusConnection": "Endpoint=***",
+"SqlConnectionString": "Server=tcp:vollmed2025***",
+"AzureCosmosDB_DatabaseName": "vollmed",
+"AzureCosmosDB_ContainerName": "resultadosmensais",
+"AzureCosmosDB_ConnectionString": "AccountEndpoint=***;"
+```
+
 ---
 Resumo
 •	Job de build: Faz checkout do código, configura o .NET, restaura dependências, compila, publica e salva os arquivos.
 •	Job de deploy: Baixa os arquivos publicados, faz login no Azure e realiza o deploy da aplicação.
+•	Publicar as Environment Variables no Azure Function App no portal do Azure
 
 Este workflow automatiza o processo de build e deploy da sua Azure Function App, evitando que você precise fazer tudo manualmente a cada atualização de código.
