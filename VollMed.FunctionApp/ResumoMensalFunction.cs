@@ -109,3 +109,4 @@ public record ResultadoMensal
     decimal honorarios,
     string geradoParaCiCd
 );
+
