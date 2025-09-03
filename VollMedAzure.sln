@@ -12,6 +12,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aulas", "Aulas", "{2D91AC3A
 		Aula1.md = Aula1.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Videos", "Videos", "{F7E64014-6AB5-4CA8-99E4-C20C22CB2838}"
+	ProjectSection(SolutionItems) = preProject
+		Videos\Video1.2.md = Videos\Video1.2.md
+		Videos\Video1.3.md = Videos\Video1.3.md
+		Videos\Video1.4.md = Videos\Video1.4.md
+		Videos\Video1.5.md = Videos\Video1.5.md
+		Videos\Video1.6.md = Videos\Video1.6.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
