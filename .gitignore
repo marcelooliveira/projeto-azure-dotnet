@@ -427,3 +427,4 @@ is-signing-key-*
 /VollMed.Web/appsettings.json
 /VollMed.WebAPI/appsettings.Development.json
 /VollMed.WebAPI/appsettings.json
+/VollMed.FunctionApp/local.settings.json

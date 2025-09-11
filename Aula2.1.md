@@ -1,0 +1,16 @@
+# Vídeo 2.1 – Azure SQL Database com EF Core
+- **Contexto**: Aplicações .NET geralmente precisam de bancos relacionais para persistência de dados, como a VollMed, que usa para armazenar dados de médicos, pacientes e consultas.
+- **Problema**: Gerenciar SQL Server local exige infraestrutura, licenciamento e dificulta escalabilidade.
+- **Solução**: 
+	- Usar Azure SQL Database integrado ao Entity Framework Core para acesso eficiente a dados.
+	- Ajustar os arquivos appsettings.json e appsettings.Development.json nos projetos VollMed.Web e VollMed.WebAPI, configurando as opções de Build Action e Copy to output directory.
+	- Criar um grupo de recursos no Azure.
+	- Criar o banco de dados Azure SQL Database  VollMedDB em servidor Linux, com configuração mínima de hardware e autenticação SQL usando usuário e senha.
+	- Configurar método de conectividade com Public  Endpoint e liberar o acesso via firewall, permitindo IP atual do desenvolvedor.
+	- Adicionar a ConnectionString no arquivo appsettings.Development.json da VollMed.WebAPI.
+	- Acessar o banco via Query Editor no portal do Azure para validar o login e autorizar o IP.
+	- Criar o esquema do banco e popular as tabelas com o comando de migração do Entity Framework.
+	- Executar a WebAPI localmente.
+	- Executar o projeto MVC em conjunto com a WebAPI.
+	- Testar o funcionamento pelo Swagger e validar a aplicação completa.
+- **Teoria**: Conceito de banco relacional como serviço (DBaaS), EF Core como ORM, connection resiliency e migrações.

@@ -10,6 +10,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aulas", "Aulas", "{2D91AC3A-9314-4945-B475-C8D25ADC4C61}"
 	ProjectSection(SolutionItems) = preProject
 		Aula1.md = Aula1.md
+		Aula2.1.md = Aula2.1.md
+		Aula2.2.md = Aula2.2.md
+		Aula2.3.md = Aula2.3.md
+		Aula2.4.md = Aula2.4.md
 		Aula2.md = Aula2.md
 	EndProjectSection
 EndProject
@@ -30,5 +34,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8E888518-CA85-41E4-A425-DD54E4953290}
 	EndGlobalSection
 EndGlobal
