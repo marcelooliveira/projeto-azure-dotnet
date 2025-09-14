@@ -70,6 +70,8 @@ FROM STRING_SPLIT('10,20,30,40,50', ',');
 
 ## Configurando a aplicação para usar o banco de dados na nuvem
 
+Vamos executar os dois passos abaixo para configurar a aplicação para usar o banco de dados na nuvem:
+
 - Fazer uma cópia de \VollMed.Web\appsettings.json, renomear para appsettings.Development.json
 - Fazer uma cópia de \VollMed.WebAPI\appsettings.json, renomear para appsettings.Development.json
 
