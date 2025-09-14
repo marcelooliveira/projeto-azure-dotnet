@@ -1,16 +1,63 @@
 # Vídeo 2.1 – Azure SQL Database com EF Core
-- **Contexto**: Aplicações .NET geralmente precisam de bancos relacionais para persistência de dados, como a VollMed, que usa para armazenar dados de médicos, pacientes e consultas.
-- **Problema**: Gerenciar SQL Server local exige infraestrutura, licenciamento e dificulta escalabilidade.
-- **Solução**: 
-	- Usar Azure SQL Database integrado ao Entity Framework Core para acesso eficiente a dados.
-	- Ajustar os arquivos appsettings.json e appsettings.Development.json nos projetos VollMed.Web e VollMed.WebAPI, configurando as opções de Build Action e Copy to output directory.
-	- Criar um grupo de recursos no Azure.
-	- Criar o banco de dados Azure SQL Database  VollMedDB em servidor Linux, com configuração mínima de hardware e autenticação SQL usando usuário e senha.
-	- Configurar método de conectividade com Public  Endpoint e liberar o acesso via firewall, permitindo IP atual do desenvolvedor.
-	- Adicionar a ConnectionString no arquivo appsettings.Development.json da VollMed.WebAPI.
-	- Acessar o banco via Query Editor no portal do Azure para validar o login e autorizar o IP.
-	- Criar o esquema do banco e popular as tabelas com o comando de migração do Entity Framework.
-	- Executar a WebAPI localmente.
-	- Executar o projeto MVC em conjunto com a WebAPI.
-	- Testar o funcionamento pelo Swagger e validar a aplicação completa.
-- **Teoria**: Conceito de banco relacional como serviço (DBaaS), EF Core como ORM, connection resiliency e migrações.
+
+## Contexto
+
+No projeto inicial, trabalhamos com um banco de dados **SQL Server local**. 
+
+## Problema:
+
+Gerenciar SQL Server local exige infraestrutura, licenciamento e dificulta escalabilidade. Além disso, empresas como a **VollMed** precisam de bancos que sejam escaláveis, disponíveis em qualquer lugar e não dependam de uma infraestrutura física própria.
+
+## Solução
+
+
+Agora, vamos migrar o banco de dados para a nuvem, utilizando o serviço **Azure SQL Database**. Essa mudança é importante porque, na prática, 
+
+### Criando banco de dados no Azure SQL Database
+
+Abrir portal do Azure: [https://portal.azure.com](https://portal.azure.com)
+
+> **Comentário:** O portal é o ponto de partida para praticamente tudo no Azure. Uma dica é sempre usar a barra de busca para encontrar os recursos rapidamente, já que a quantidade de opções pode ser grande no início.
+
+No Portal Azure, criar um novo recurso: **+ Create a resource > Databases > SQL Database**
+
+Em seguida, preencher os dados do novo banco de dados:
+
+* **Assinatura**: (sua assinatura - azure subscription)
+
+  > É como a "conta de cobrança" onde os recursos ficam vinculados. Pense nisso como a carteira da empresa dentro do Azure.
+
+* **Plano**: SQL Database
+
+* **Grupo de recursos**: `vollmed-rg`
+
+  > Grupos de recursos são como "pastas" onde organizamos os serviços. Isso facilita o gerenciamento, principalmente quando temos ambientes diferentes (dev, teste, produção).
+
+* **Nome do banco de dados**: `VollMedDB`
+
+* **Servidor**: (Clicar em Criar novo)
+
+* **Nome do servidor (único no mundo todo)**: `vollmeddb20250815`
+
+  > Dica: nomes de servidores precisam ser globais, então é comum adicionar números ou datas para garantir que não haja conflito.
+
+* **Localização**: East US ou East US 2
+
+  > Aqui entra uma decisão estratégica: escolher regiões próximas dos usuários finais pode reduzir a latência e melhorar a experiência.
+
+* **Método de autenticação**: Usar autenticação SQL
+
+* **Logon do administrador do servidor**: `vollmed`
+
+* **Senha**: `!v0llmed`
+
+  > Nunca use senhas reais em exemplos públicos. Aqui usamos apenas para fins didáticos. Em produção, é essencial aplicar boas práticas de segurança, como integração com o **Azure Active Directory**.
+
+* **Deseja usar o pool elástico SQL?** Não
+
+* **Ambiente de carga de trabalho**: Desenvolvimento
+
+* **Computação + armazenamento**: Uso Geral - Sem servidor
+
+  > O modo **serverless** é interessante em cenários de desenvolvimento e testes, porque você só paga quando realmente utiliza o banco.
+

@@ -12,67 +12,88 @@
 
 # Aula 2
 
-010. Configurar os arquivos appsettings.json:
-    - \VollMed.Web\appsettings.json
-        - Build action: Content
-        - Copy to output directory: Do not copy
-    - \VollMed.Web\appsettings.Development.json
-        - Build action: Content
-        - Copy to output directory: Copy if newer
-    - \VollMed.WebAPI\appsettings.json
-        - Build action: Content
-        - Copy to output directory: Do not copy
-    - \VollMed.WebAPI\appsettings.Development.json
-        - Build action: Content
-        - Copy to output directory: Copy if newer
+No projeto inicial, trabalhamos com um banco de dados SQL Server local. Agora, vamos migrar o banco de dados para a nuvem, utilizando o serviço Azure SQL Database.
 
-020. criar grupo de recursos
-030. criar banco de dados Azure Sql Database
-    - Banco: VollMedDB
-    - Servidor: vollmed20250808
-    - SO: linux
-    - mínimo de hardware
-    - autenticação sql com usuário e senha:
-        - vollmed
-        - !v0llmed
-    - Connectivity method:
-        - Public Endpoint
-    - Networking
-        - Firewall rules
-            - Allow certain public internet IP addresses to access your resource: YES
-            - Add current client IP address: YES
+## Criando banco de dados no Azure SQL Database
 
-032. ConnectionString em VollMed.WebAPI
+Abrir portal do Azure: https://portal.azure.com
 
-Arquivo appsettings.Development.json:
+No Portal Azure, criar um novo recurso: + Create a resource > Databases > SQL Database
+
+Em seguida, preencher os dados do novo banco de dados:
+
+- Assinatura: (sua assinatura - azure subscription)
+- Plano: SQL Database
+- Clicar em Criar
+- Grupo de recursos: vollmed-rg
+- Nome do banco de dados: VollMedDB
+- Servidor: (Clicar em Criar novo)
+- Nome do servidor (deve ser único no mundo todo): vollmeddb20250815
+- Localização: US East US (ou US East 2)
+- Método de autenticação: Usar autenticação SQL
+- Logon do administrador do servidor: vollmed
+- Senha: !v0llmed
+- Confirmar senha: !v0llmed
+- Deseja usar o pool elástico SQL? Não
+- Ambiente de carga de trabalho: Desenvolvimento
+- Computação + armazenamento: Uso Geral - Sem servidor
+- Redundância do armazenamento de backup: Armazenamento de backup com redundância local
+- Clicar em Avançar + Redes
+- Método de conectividade: Ponto de extremidade público
+- Regras de Firewall
+    - Permitir que serviços e recursos do Azure acessem este servidor: SIM
+    - Adicionar o endereço IP do cliente atual: SIM
+- Política de conexão: Padrão
+- Avançar: Segurança
+    - Manter TODAS as opções padrão
+- Avançar: Configurações adicionais
+    - Manter TODAS as opções padrão
+- Avançar: Rótulos
+    - Não adicionar nada
+- Avançar: Revisar + criar
+- Clicar em Criar
+
+Agora vamos aguardar a implantação do banco de dados.
+
+- Após implantação, clicar no Editor de Consultas no painel esquerdo.
+- Clicar em OK abaixo de Autenticação do servidor SQL
+
+Veja que ainda não existe nenhuma tabela no banco de dados. Vamos criá-las depois.
+
+Agora, para testar a conexão, execute uma query simples no Query Editor para obter a média entre números de uma lista separada por vírgulas:
+
+```sql
+SELECT AVG(CONVERT(INT, value)) AS Media
+FROM STRING_SPLIT('10,20,30,40,50', ',');
+```
+
+
+## Configurando a aplicação para usar o banco de dados na nuvem
+
+- Fazer uma cópia de \VollMed.Web\appsettings.json, renomear para appsettings.Development.json
+- Fazer uma cópia de \VollMed.WebAPI\appsettings.json, renomear para appsettings.Development.json
+
+No portal do Azure, acessar o recurso do banco de dados VollMedDB, clicar em Visão geral e abaixo de "Cadeias de conexão" copiar a string de conexão (Connection String) do ADO.NET (autenticação SQL).
+
+Abrir e editar arquivo appsettings.Development.json no projeto VollMed.WebAPI:
 
 ```json
   "ConnectionStrings": {
-    "VollMedDB": "Server=tcp:vollmed20250815.database.windows.net,1433;Initial Catalog=VollMedDB;Persist Security Info=False;User ID=vollmed;Password=**********;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    "VollMedDB": "Server=tcp:vollmed*******.database.windows.net,1433;Initial Catalog=VollMedDB;Persist Security Info=False;User ID=vollmed;Password=**********;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   }
 ```
 
-033. Habilitar acesso ao banco
-
-- Portal Azure > VollMedDB > Query editor
-- Tentar login com usuário e senha
-- Verificar erro no firewall: Cannot open server 'vollmed2025xxxx' requested by the login. Client with IP address 'xxx.xxx.xxx.xxx' is not allowed ...
-- Clicar no link logo abaixo: Allowlist IP xxx.xxx.xxx.xxx on server vollmed2025xxxx
-- 
-
-
-035. Criar esquema banco de dados + popular tabelas
+Agora abra o terminal no Visual Studio para criar esquema banco de dados + popular tabelas
 
 ```console
 cd VollMed.WebAPI
 dotnet ef database update
 ```
     
-040. Rodar WebAPI local
+Agora volte ao Portal do Azure, vá para o Editor de Consultas e visualize os dados de médicos com a consulta:
 
-045. Rodar MVC + WebAPI, 
+```sql
+SELECT Nome FROM [dbo].[medicos]
+```
 
-046. testar o swagger/index.html
-
-047. testar a aplicação completa
-
+Agora rode a solução no Visual Studio com F5 para testar a comunicação entre a aplicação cliente e o banco de dados na nuvem.
