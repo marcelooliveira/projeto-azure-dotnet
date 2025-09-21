@@ -19,17 +19,25 @@
 
 2 - Escolha a opção **Azure Cosmos DB for NoSQL**.
 
-3 - Em **Account Name**, escreva `vollmed-cosmosdb`.
+3 - **Workload Type**: `Learning`
 
-4 - Em **Capacity Mode**, escolha **Serverless** e clique em **Create**.
+4 - **Grupo de Recursos**: `vollmed-rg`
 
-5 - Aguarde a criação do Azure Cosmos DB Account
+5 - Em **Account Name**, escreva `vollmed-cosmosdb`.
 
-6 - Entre no menu **Data Explorer**.
+6 - Em **Availability Zone**, escolha `Disable`.
 
-7 - Crie um novo Container no database `vollmed`, preencha **Database id** como "vollmed" e  **Container id** como `ResumoMensalConsultas` e **Partition id** como `id`.
+7 - Em **Localização** escolha `East US 2`.
 
-8 - Agora expanda o nó “items” do container “ResumoMensalConsultas” e clique em **New Item**. Preencha o documento com o seguinte conteúdo JSON:
+8 - Em **Capacity Mode**, escolha **Serverless** e clique em **Examinar + Criar**.
+
+9 - Aguarde a criação do Azure Cosmos DB Account
+
+10 - Entre no menu **Data Explorer**.
+
+11 - Clique em **+ Container** para criar um novo Container. Forneça o nome de database `vollmed`, preencha **Database id** como "vollmed" e  **Container id** como `ResumoMensalConsultas` e **Partition id** como `id`.
+
+12 - Agora expanda o nó “items” do container “ResumoMensalConsultas” e clique em **New Item**. Preencha o documento com o seguinte conteúdo JSON:
 
 ```json
 {
@@ -46,7 +54,7 @@
 }
 ```
 
-9 - Clique em ***Save*** para salvar o item.
+13 - Clique em ***Save*** para salvar o item.
 
 ## Azure Service Bus
 
