@@ -40,14 +40,11 @@
 2. Contas: “Somente contas neste diretório organizacional”.
 3. URI de redirecionamento (cloud):
    * Tipo: Web
-   * URL: `https://vollmedweb2025XXXXXXXXXXXXXX.azurewebsites.net/signin-oidc`
+   * URL: `https://localhost:5001/signin-oidc`
 4. Registrar.
 5. Em **Visão Geral**, clicar em **URIs de Redirecionamento: 1 Web, 0 SPA, 0 cliente público**
-6. Na página de **Autenticação**, na seção **Configurações de plataforma**, adicionar URI de redirecionamento (local):
-   * Tipo: Web
-   * URL: `https://localhost:5001/signin-oidc`
 7. Salvar.
-   * Abaixo de "Front-channel logout URL" (URL de logoff do canal frontal), adicionar URL de logout: `https://vollmedweb2025XXXXXXXXXXXXXX.azurewebsites.net/signout-callback-oidc`
+   * Abaixo de "Front-channel logout URL" (URL de logoff do canal frontal), adicionar URL de logout: `https://localhost:5001/signout-callback-oidc`
 8. Na seção **Concessão implícita e fluxos híbridos**, marcar “ID tokens” e “Access tokens”.
 9. Clicar em Salvar.
 10. No menu lateral, clique em **Gerenciar > Permissões de API**:
@@ -63,7 +60,7 @@
     * Clicar em **+Novo segredo do cliente**
     * - Descrição: secret
     * Clicar em **Adicionar**
-    * Copiar e guardar o valor 
+    * Copiar e guardar o valor
 
 ### **Passo 3 – Autorizar app MVC no app VollMed.WebAPI** 
 
@@ -81,9 +78,9 @@
 9. Marcar como "escopo autorizado": api://xxxxxxxxxxxxx/vollmed_api.all
 10. Clicar em **Adicionar aplicativo**
 
-### **Passo 4 – Configurar o MS Entra ID Nos projetos
+### **Passo 4 – Configurar o MS Entra ID No Projeto VollMed.WebApi
 
-#### Projeto VollMed.WebApi
+#### 1. Adicione configurações do MS Entra ID (AzureAD)
 
 Adicionar o seguinte bloco de configurações no arquivo **appsettings.Development.json**:
 
@@ -93,23 +90,67 @@ Adicionar o seguinte bloco de configurações no arquivo **appsettings.Development
 	"Domain": "xxxxxx.onmicrosoft.com",
 	"TenantId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
 	"ClientId": "[CLIENT-ID-DO-APP-REGISTRATION-DO-API]",
-	"Audience": "api://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	"Audience": "api://[CLIENT-ID-DO-APP-REGISTRATION-DO-API]",
+    "Authority": "https://login.microsoftonline.com/[TENANT-ID]/v2.0"
   }
 ```
 
-### Environment Variables - VollMedWebApi
+#### 2. Ativar `[Authorize]` nos Controllers da VollMed.WebAPI
 
-App Settings:
+* \VollMed.WebAPI\Controllers\ConsultaController.cs
+* \VollMed.WebAPI\Controllers\MedicoController.cs
 
-```bash
-AzureAd__Instance=https://login.microsoftonline.com/
-AzureAd__Domain=xxxxx.onmicrosoft.com
-AzureAd__TenantId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-AzureAd__ClientId=[CLIENT-ID-DO-APP-REGISTRATION-DO-API]
-AzureAd__Audience=api://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```csharp
+[Authorize]
 ```
 
-### VollMed.Web
+**Explicação:**
+Exija autenticação para acessar rotas da API, protegendo endpoints sensíveis.
+
+---
+
+#### 3. Configurar autenticação JWT na VollMed.WebAPI
+
+Abrir o terminal na pasta-raiz da solução.
+
+Executar os comandos para instalar os pacotes de autenticação e identidade:
+
+```powershell
+cd VollMed.WebAPI
+
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+dotnet add package Microsoft.Identity.Web
+```
+
+No arquivo `Program.cs` adicione os middlewares abaixo:
+
+```csharp
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(options => {
+        builder.Configuration.Bind("AzureAd", options);
+    },
+    options => {
+        builder.Configuration.Bind("AzureAd", options);
+    });
+builder.Services.AddAuthorization();
+```
+
+**Explicação:**
+Configure autenticação JWT usando MS Entra ID para proteger a WebAPI, vinculando as configurações do Azure AD.
+
+#### 4. Ativar autenticação e autorização no pipeline do VollMed.WebAPI
+
+No arquivo `Program.cs`, adicione as linhas **antes** de `app.UseHttpsRedirection();`
+
+```csharp
+app.UseAuthentication();
+app.UseAuthorization();
+```
+
+
+### **Passo 5 –  
+
+#### 1. Adicione configurações do MS Entra ID (AzureAD)
 
 Adicionar o seguinte bloco de configurações no arquivo **appsettings.Development.json**:
 
@@ -129,20 +170,26 @@ Adicionar o seguinte bloco de configurações no arquivo **appsettings.Development
   }
 ```
 
-## Environment Variables - VollMed.Web
+#### 2. Habilite o SignOut no projeto VollMed.WebAPI
 
-App Settings:
+* Abra o arquivo `HomeController.cs`
+* Descomente as linhas do método `Logout`
 
-```bash
-AzureAd__Instance=https://login.microsoftonline.com/
-AzureAd__Domain=xxxxxxxxxxx.onmicrosoft.com
-AzureAd__TenantId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-AzureAd__ClientId=[CLIENT-ID-DO-APP-REGISTRATION-DO-MVC]
-AzureAd__ClientSecret=[SECRET-DO-APP-REGISTRATION-DO-MVC]
-VollMed_WebApi__Scope=api://xxxxxxxxxxxxx/vollmed_api.all
+```csharp
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            return SignOut(
+                new AuthenticationProperties { RedirectUri = "/" },
+                OpenIdConnectDefaults.AuthenticationScheme,  // "OpenIdConnect"
+                CookieAuthenticationDefaults.AuthenticationScheme // "Cookies"
+            );
+        }
 ```
 
-## 2. Ativar `[Authorize]` nos Controllers
+Esse método realiza o logout completo do usuário em uma aplicação ASP.NET Core. Ele encerra tanto a sessão local, removendo o cookie de autenticação, quanto a sessão no provedor de identidade configurado via OpenID Connect (como o Microsoft Entra ID). Após finalizar o logout, o usuário é automaticamente redirecionado para a página inicial da aplicação (/).
+
+#### 3. Ativar `[Authorize]` nos Controllers
 
 `VollMed.Web/Controllers/ConsultaController.cs`
 
@@ -160,7 +207,9 @@ Remova o comentário da anotação `[Authorize]` nos controllers para exigir autent
 
 ---
 
-## 3. Configurar autenticação e autorização no Web (MVC)
+#### 4. Configurar autenticação e autorização no Web (MVC)
+
+Abra o terminal no Visual Studio (CTRL + apóstrofo)
 
 Instale os pacotes para autenticação e autorização:
 
@@ -171,7 +220,7 @@ dotnet add package Microsoft.Identity.Web
 dotnet add package Microsoft.Identity.Web.DownstreamApi
 ```
 
-Em Program.cs, adicione esta linha antes de `var app = builder.Build();`:
+Em `Program.cs`, adicione esta linha antes de `var app = builder.Build();`:
 
 ```csharp
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -188,17 +237,19 @@ builder.Services
     .AddInMemoryTokenCaches();
 ```
 
-Depois, adicione esta linha:
-
-```csharp
-IdentityModelEventSource.ShowPII = true;
-```
-
-
 **Explicação:**
 Habilite autenticação OpenID Connect e integração com MS Entra ID, além de aquisição de tokens para chamadas à API protegida.
 
-## 3. Ajustar BaseHttpService.cs em VollMed.Web:
+#### 5. Ativar autenticação e autorização no pipeline em VollMed.Web
+
+No arquivo `Program.cs`, adicione as linhas abaixo depois de `app.UseRouting();`
+
+```csharp
+app.UseAuthentication();
+app.UseAuthorization();
+```
+
+#### 6. Ajustar BaseHttpService.cs em VollMed.Web:
 
 A ideia é passar o access token no cabeçalho das requisições.
 
@@ -217,7 +268,7 @@ Adicione e inicialize o campo somente-leitura `_tokenAcquisition`:
         .
 ```
 
-Adicione no final da classe `BaseHttpService`:
+Adicione o método `SetTokenAsync` no final da classe `BaseHttpService`:
 
 ```csharp
         private async Task SetTokenAsync(HttpClient httpClient)
@@ -264,106 +315,50 @@ Agora abra o arquivo `\VollMed.Web\Services\MedVollApiService.cs` e adicione o p
 
 
 
-## 4. Ativar autenticação e autorização no pipeline em VollMed.Web
-
-No arquivo `Program.cs`, adicione as linhas abaixo depois de `app.UseRouting();`
-
-```csharp
-app.UseAuthentication();
-app.UseAuthorization();
-```
 
 **Explicação:**
 Garanta que o middleware de autenticação e autorização está ativo na aplicação.
 
----
-
-## 5. Habilite o SignOut no projeto VollMed.WebAPI
-
-* Abra o arquivo `HomeController.cs`
-* Descomente as linhas do método `Logout`
-
-```csharp
-        [HttpPost]
-        public IActionResult Logout()
-        {
-            return SignOut(
-                new AuthenticationProperties { RedirectUri = "/" },
-                OpenIdConnectDefaults.AuthenticationScheme,  // "OpenIdConnect"
-                CookieAuthenticationDefaults.AuthenticationScheme // "Cookies"
-            );
-        }
-```
-
-## 6. Ativar `[Authorize]` nos Controllers da VollMed.WebAPI
-
-* \VollMed.WebAPI\Controllers\ConsultaController.cs
-* \VollMed.WebAPI\Controllers\MedicoController.cs
-
-```csharp
-[Authorize]
-```
-
-**Explicação:**
-Exija autenticação para acessar rotas da API, protegendo endpoints sensíveis.
-
----
-
-## 7. Configurar autenticação JWT na VollMed.WebAPI
-
-Abrir o terminal na pasta-raiz da solução.
-
-Executar os comandos para instalar os pacotes de autenticação e identidade:
-
-```powershell
-cd VollMed.WebAPI
-
-dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
-dotnet add package Microsoft.Identity.Web
-```
-
-No arquivo `Program.cs` adicione os middlewares abaixo:
-
-```csharp
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(options => {
-        builder.Configuration.Bind("AzureAd", options);
-    },
-    options => {
-        builder.Configuration.Bind("AzureAd", options);
-    });
-builder.Services.AddAuthorization();
-```
-
-**Explicação:**
-Configure autenticação JWT usando MS Entra ID para proteger a WebAPI, vinculando as configurações do Azure AD.
-
-## 8. Ativar autenticação e autorização no pipeline do VollMed.WebAPI
-
-No arquivo `Program.cs`, adicione as linhas **antes** de `app.UseHttpsRedirection();`
-
-```csharp
-app.UseAuthentication();
-app.UseAuthorization();
-```
-
-
-## 9. Testar aplicação local com autorização e autenticação
+#### 7. Testar aplicação local com autorização e autenticação
 
 * Rode os 2 projetos da solução com a tecla F5.
 * Entre no menu **Médicos**
-* Obs.: no começo, a operação pode falhar com time-out
-* 
+* Obs.: nas primeiras vezes, a operação pode falhar com time-out.
 
-## 10. Testar aplicação na web com autorização e autenticação
+===========================
 
-090. Reiniciar os apps
+# FAÇA COMO EU FIZ
 
-    * Iniciar Vollmed.WebAPI
-    * Iniciar Vollmed.Web
-    * Abrir aplicação Vollmed.Web
-    * Aguardar alguns minutos
-    * Se houver erro, tentar novamente algumas vezes
+`https://vollmedweb2025XXXXXXXXXXXXXX.azurewebsites.net/signin-oidc`
 
+`https://vollmedweb2025XXXXXXXXXXXXXX.azurewebsites.net/signout-callback-oidc`
+
+### Environment Variables - VollMed.WebApi
+
+Abrir portal do Azure
+Adicionar as variáveis de ambiente no App Service VollMed.WebApi:
+
+```bash
+AzureAd__Instance=https://login.microsoftonline.com/
+AzureAd__Domain=xxxxx.onmicrosoft.com
+AzureAd__TenantId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AzureAd__ClientId=[CLIENT-ID-DO-APP-REGISTRATION-DO-API]
+AzureAd__Audience=api://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+
+## Environment Variables - VollMed.Web
+
+Abrir portal do Azure
+Adicionar as variáveis de ambiente no App Service VollMed.WebApi:
+
+```bash
+AzureAd__Instance=https://login.microsoftonline.com/
+AzureAd__Domain=xxxxxxxxxxx.onmicrosoft.com
+AzureAd__TenantId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AzureAd__ClientId=[CLIENT-ID-DO-APP-REGISTRATION-DO-MVC]
+AzureAd__ClientSecret=[SECRET-DO-APP-REGISTRATION-DO-MVC]
+VollMed_WebApi__Scope=api://xxxxxxxxxxxxx/vollmed_api.all
+```
 
 
