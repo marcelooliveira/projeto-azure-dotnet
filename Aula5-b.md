@@ -202,10 +202,8 @@ Nesse roteiro, vamos aprender a visualizar métricas em tempo real e a criar gr�
    * Nome do workspace: vollmed-log-workspace
    * Região: igual à da sua aplicação (East US 2).
 5. Clique em **Revisar + criar** e depois em **Criar**.
-6. Após a criação do Log Analytics "vollmed-log-workspace", clique em "Ir para o recurso".
-7. Clique no menu **Monitoramento > Configurações de Diagnóstico**.
 
-## **2. Associar o Application Insights com o novo Log Analytics**
+## **2. Associar o Application Insights com o novo Workspace do Log Analytics**
 
 1. Acesse o recurso **Serviços de Aplicativos** e clique no app de backend **VollMed.WebAPI**.
 2. No menu lateral esquerdo, clique **Monitoramento > Application Insights**.
@@ -325,10 +323,9 @@ Clique com botão direito sobre o nome do projeto WebAPI, e publique a aplicaç�
 
 1. Inicie a aplicação **VollMed.WebAPI**.
 2. Inicie a aplicação **VollMed.Web**.
-3. Navegue pelas telas de Médicos e Consultas para gerar requisições reais.
-4. Gere também alguns erros simulados (ex: acessar um endpoint inexistente).
+3. Entre no menu **Consultas** e crie 3 novas consultas médicas.
 
-👉 *Essas interações serão registradas no workspace após alguns segundos/minutos.*
+👉 *Essas interações serão enviadas para o Workspace do Log Analytics através de telemetria.*
 
 ---
 
