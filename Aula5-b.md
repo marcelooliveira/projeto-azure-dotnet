@@ -186,7 +186,7 @@ O Azure Monitor é o serviço central de observabilidade do Azure — ele coleta
 
 É através dele que o Application Insights e o Log Analytics se integram, oferecendo uma visão completa do desempenho e da integridade dos serviços.
 
-Nesse roteiro, vamos aprender a visualizar métricas em tempo real e a criar gráficos personalizados para monitorar a **Web API VollMed**.
+Nesse roteiro, vamos aprender a criar um novo Log Analytics Workspace, onde vão ser gravados os logs das aplicações da vollmed.
 
 ---
 
@@ -211,7 +211,7 @@ Nesse roteiro, vamos aprender a visualizar métricas em tempo real e a criar gr�
 4. Escolher o **Workspace do Log Analytics**: vollmed-log-workspace.
 5. Clique em **Aplicar**.
 
-*Dessa forma, todos os logs do Application Insights irão automaticamente para o Log Analytics Workspace.* "vollmed-log-workspace".
+*Dessa forma, todos os logs do Application Insights irão automaticamente para o Workspace do Log Analytics*: "vollmed-log-workspace".
 
 6. No menu lateral esquerdo, clique **Monitoramento > Adicionar configurações de diagnóstico** e prencha o formulário.
 	- Nome da configuração de diagnóstico: diagnostico vollmed
@@ -220,8 +220,8 @@ Nesse roteiro, vamos aprender a visualizar métricas em tempo real e a criar gr�
 	- Detalhes do destino: Enviar para o workspace do Log Analytics
 	- Workspace do Log Analytics: vollmed-log-workspace
 	- clicar no botão **Salvar**.
-7. Aguarde enquanto a implantação está em andamento, depois clique em **Ir para o recurso** quando terminar.
-*Este workspace será o "repositório central" dos logs que você coletar.*
+7. Aguarde enquanto a implantação está em andamento.
+*Este workspace será o "repositório central" dos logs que você irá coletar.*
 
 ##  **3. Configurar Log Analytics no App Service**
 
@@ -230,18 +230,31 @@ Nesse roteiro, vamos aprender a visualizar métricas em tempo real e a criar gr�
 3. Abra o menu **Configurações > Variáveis de Ambiente**.
 4. Abra a configuração `APPINSIGHTS_INSTRUMENTATIONKEY`.
 5. Copie o valor dessa configuração, cole num bloco de notas.
-6. Adicione mais duas variáveis de ambiente:
+6. Adicione esta variável de ambiente:
+
+| Nome da variável                          | Valor         |
+| ----------------------------------------- | ------------- |
+| `ApplicationInsights__ConnectionString`   | `InstrumentationKey=[APPINSIGHTS_INSTRUMENTATIONKEY]` |
+
+Depois disso, clique em "Aplicar" e "Salvar".
+
+##  **4. Configurar Log Analytics no Visual Studio**
+
+1. No portal do Azure, abra o Serviço de Aplicativos.
+2. Localize a aplicação de backend **VollMed.WebAPI**.
+3. Abra o menu **Configurações > Variáveis de Ambiente**.
+4. Adicione mais duas variáveis de ambiente:
 
 | Nome da variável                          | Valor         |
 | ----------------------------------------- | ------------- |
 | `Logging__LogLevel__Default`              | `Information` |
 | `Logging__LogLevel__Microsoft.AspNetCore` | `Information` |
-| `ApplicationInsights__ConnectionString`   | `MESMO DE APPINSIGHTS_INSTRUMENTATIONKEY` |
 
-##  **3. Configurar Log Analytics no Visual Studio**
+Depois disso, clique em "Aplicar" e "Salvar".
 
-7. Abra o projeto **VollMed.WebAPI** no Visual Studio.
-8. No arquivo `appsettings.Development.json`, cole esta configuração:
+
+5. Abra o projeto **VollMed.WebAPI** no Visual Studio.
+6. No arquivo `appsettings.Development.json`, cole esta configuração:
 
 ```json
   "Logging": {
@@ -255,7 +268,7 @@ Nesse roteiro, vamos aprender a visualizar métricas em tempo real e a criar gr�
   }
 ```
 
-9. No terminal PowerShell, vá para a pasta do projeto VollMed.WebAPI e rode estes comandos:
+7. No terminal PowerShell, vá para a pasta do projeto VollMed.WebAPI e rode estes comandos:
 
 ```console
 dotnet add package Azure.Monitor.OpenTelemetry.AspNetCore
@@ -263,7 +276,9 @@ dotnet add package Microsoft.ApplicationInsights.AspNetCore
 dotnet add package Microsoft.Extensions.Logging.ApplicationInsights
 ```
 
-10. No arquivo `Program.cs`, adicione logo antes da declaração `var app = builder.Build();`:
+##  **4. Habilitar Telemetria e Republicar o App**
+
+1. No arquivo `Program.cs`, adicione logo antes da declaração `var app = builder.Build();`:
 
 ```csharp
 // Habilita o Application Insights (telemetria automática)
@@ -285,7 +300,7 @@ builder.Services.AddOpenTelemetry()
     });
 ```
 
-11. Agora, modifique o `ConsultaController` para enviar telemetria sempre que uma consulta for agendada.
+2. Agora, modifique o `ConsultaController` para enviar telemetria sempre que uma consulta for agendada.
 
 Crie um campo privado `_logger` e o inicialize no construtor por injeção de dependência:
 
@@ -304,7 +319,7 @@ Crie um campo privado `_logger` e o inicialize no construtor por injeção de de
         }
 ```
 
-No método `SalvarAsync`, adicione o log de informação antes do retorno do método:
+3. No método `SalvarAsync`, adicione o log de informação antes do retorno do método:
 
 ```csharp
 				await _consultaservice.CadastrarAsync(dados);
@@ -312,14 +327,16 @@ No método `SalvarAsync`, adicione o log de informação antes do retorno do mé
 				return Ok(dados);
 ```
 
-Compile a aplicação.
+4. Compile a aplicação.
 
-Clique com botão direito sobre o nome do projeto WebAPI, e publique a aplicação no Azure.
+5. Clique com botão direito sobre o nome do projeto WebAPI, e clique no botão Publish.
+
+6. Em seguida, clique no botão Publish da página para publicar a aplicação no Azure.
 
 
 ---
 
-## **4. Gerar logs reais na aplicação**
+## **5. Gerar logs reais na aplicação**
 
 1. Inicie a aplicação **VollMed.WebAPI**.
 2. Inicie a aplicação **VollMed.Web**.
@@ -329,7 +346,7 @@ Clique com botão direito sobre o nome do projeto WebAPI, e publique a aplicaç�
 
 ---
 
-## **5. Consultar logs no Log Analytics**
+## **6. Consultar logs no Log Analytics**
 
 1. No portal do Azure, abra o **Workspace do Log Analytics**.
 2. Abra o "vollmed-log-workspace"
