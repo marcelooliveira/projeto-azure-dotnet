@@ -1,194 +1,221 @@
-| Aula| SQL | API / MVC | auth | Monitoring |    Synch       | Infra     | Caching     |
+Ôªø| Aula| SQL | API / MVC | auth | Monitoring |    Synch       | Infra     | Caching     |
 | ---| --- | --- | --- | --- |    ---       | ---     | ---     |
-| 1 | local | local |     -    |      -     |    sÌncrono    | az portal |     -       |
-| 2 | CLOUD | local |     -    |      -     |    sÌncrono    | az portal |     -       |
-| 3 | CLOUD | CLOUD |     -    |      -     |    sÌncrono    | az portal |     -       |
-| 4 | CLOUD | CLOUD | MS ENTRA |      -     |    sÌncrono    | az portal |     -       |
-| 5 | CLOUD | CLOUD | MS ENTRA | AZ MONITOR |    sÌncrono    | az portal |     -       |
-| 6 | CLOUD | CLOUD | MS ENTRA | AZ MONITOR | MSG/ASSÕNCRONO | az portal |     -       |
-| 7 | CLOUD | CLOUD | MS ENTRA | AZ MONITOR | MSG/ASSÕNCRONO | IAAC      |     -       |
-| 8 | CLOUD | CLOUD | MS ENTRA | AZ MONITOR | MSG/ASSÕNCRONO | IAAC      | AZURE REDIS |
+| 1 | local | local |     -    |      -     |    s√≠ncrono    | az portal |     -       |
+| 2 | CLOUD | local |     -    |      -     |    s√≠ncrono    | az portal |     -       |
+| 3 | CLOUD | CLOUD |     -    |      -     |    s√≠ncrono    | az portal |     -       |
+| 4 | CLOUD | CLOUD | MS ENTRA |      -     |    s√≠ncrono    | az portal |     -       |
+| 5 | CLOUD | CLOUD | MS ENTRA | AZ MONITOR |    s√≠ncrono    | az portal |     -       |
+| 6 | CLOUD | CLOUD | MS ENTRA | AZ MONITOR | MSG/ASS√çNCRONO | az portal |     -       |
+| 7 | CLOUD | CLOUD | MS ENTRA | AZ MONITOR | MSG/ASS√çNCRONO | IAAC      |     -       |
+| 8 | CLOUD | CLOUD | MS ENTRA | AZ MONITOR | MSG/ASS√çNCRONO | IAAC      | AZURE REDIS |
 
 
-# Aula 7 - DevOps e Infraestrutura como CÛdigo 
+# Aula 7 - DevOps e Infraestrutura como C√≥digo 
 
-O que È este arquivo?
-Este È um arquivo de workflow do GitHub Actions. Ele automatiza o processo de build e deploy de uma Azure Function App .NET sempre que h· um push para o branch Aula7.
+## V√≠deo 7.1 - Explicando publica√ß√£o via Visual Studio
+ 
+**Contexto**
+Desenvolvemos a Function no Visual Studio: No Visual Studio, criamos e testamos a Function localmente.
+
+**Problema**
+Processo manual e dependente do ambiente local.
+Precisamos enviar o c√≥digo para o Azure:
+O Visual Studio oferece publica√ß√£o direta: Para coloc√°-la em produ√ß√£o, o desenvolvedor pode usar o assistente de publica√ß√£o.
+
+**Solu√ß√£o**
+Usar o perfil de publica√ß√£o (.pubxml) para gerar e enviar o pacote: Esse m√©todo gera um arquivo .pubxml, que cont√©m as configura√ß√µes do destino no Azure.
+
+**Teoria**
+O .pubxml cria um pacote ZIP e envia ao Azure App Service: O Visual Studio empacota o c√≥digo em um arquivo .zip e faz o upload direto. √â simples, mas depende do ambiente do desenvolvedor e n√£o automatiza o processo.
+
+## V√≠deo 7.2 - Publicando Azure Function direto do Visual Studio para o Azure
+
+1. Clique com bot√£o direito do mouse sobre o projeto VollMed.FunctionApp
+2. Clique no menu Publish
+3. Target: Escolha Azure
+4. Specific target: Escolha Azure Function App
+5. Functions instance: Clique em **+ Create new**
+6. No formul√°rio "Create New":
+    6.1. Name: VollMedFunctionApp2025************
+    6.2. Resource group: vollmed-rg
+    6.3. Plan type: App Service Plan
+    6.4. Operation System: Linux
+    6.5. Azure Storage: clique "+ Create new"
+    6.6. Clique "Next"
+
+7. Deployment type: Publish (generates pubxml file)
+8. Clique "Finish"
+9. Conclua o publish ‚Äî isso cria a infraestrutura e configura o app no Azure.
+
+Essa implanta√ß√£o inicial garante que a Function App exista no Azure e possa receber futuros deploys automatizados.
+
+## V√≠deo 7.3 ‚Äî Explicando publica√ß√£o via GitHub Actions
+
+**Contexto**
+Queremos automatizar o deploy da Azure Function
+O c√≥digo est√° versionado no GitHub. Em vez de publicar manualmente, configuramos um pipeline no GitHub Actions.
+
+**Problema**
+A publica√ß√£o manual √© suscet√≠vel a erros e n√£o √© reprodut√≠vel
+
+**Solu√ß√£o**
+Criar pipeline de CI/CD com GitHub Actions. CI/CD significa Continuous Integration / Continuous Deployment. Cada altera√ß√£o no c√≥digo √© aplicada atrav√©s de um commit. O commit vai subir para o GitHub atrav√©s de um comando push. E sempre que h√° push na branch principal, o workflow executa automaticamente.
+
+**Teoria**
+O workflow compila o projeto, gera o pacote e faz o deploy no Azure automaticamente. Ele usa o mesmo processo de empacotamento e envio do .zip para o Azure.
+Isso garante consist√™ncia, rastreabilidade e integra√ß√£o cont√≠nua.
+O resultado final √© o mesmo: a Function atualizada e rodando no Azure.
+
+## V√≠deo 7.4 - Criando um workflow do GitHub Actions para publicar Azure Function App
+
+Para publicar Azure Function via GitHub Actions
+
+1. Abra o portal do azure e navegue at√© a Function App criada anteriormente: VollMedFunctionApp2025************
+2. Clique no menu Centro de Implanta√ß√£o (Deployment Center) e preencha as informa√ß√µes conforme abaixo:
+    - Source: GitHub
+    - Organiza√ß√£o
+    - Reposit√≥rio
+    - Branch
+    - Op√ß√£o de fluxo de trabalho: Adicionar workflow
+    - Tipo de autentica√ß√£o: identidade atribu√≠da pelo usu√°rio
+    - Salvar
+3. Abrir reposit√≥rio GitHub no navegador
+4. Abra os commits da branch Main
+5. Note o arquivo de publica√ß√£o do GitHub actions: VollMedFunctionApp202****************.yml
+6. Clicar na aba Actions
+7. Aguarde a execu√ß√£o da action.
+
+## V√≠deo 7.5 - Adicionando nova fun√ß√£o HTTP na Azure Function App
+
+1. Baixar o workflow criado pelo Portal do Azure na branch main no v√≠deo anterior:
+```bash
+git fetch
+git pull --all
+```
+2. Clique em Publicar para verificar se o workflow foi gerado automaticamente pelo portal do Azure.
+
+Agora crie e suba para o GitHub uma nova fun√ß√£o HTTP chamada GerarProntuarioMedico.
+
+3. No Visual Studio, clique com bot√£o direito sobre projeto Azure Function App.
+4. Adicione uma nova fun√ß√£o HTTP chamada GerarProntuarioMedico.
+5. Add New Azure Function:
+    13.1. HTTP trigger
+    13.2. Authorization level: Anonymous
+
+6. Publique as altera√ß√µes no GitHub:
+```bash
+git add .
+git commit -m "Nova fun√ß√£o GerarProntuarioMedico"
+git push
+```
+7. Abrir reposit√≥rio GitHub no navegador
+8. Abra a aba Actions
+9. Aguarde a execu√ß√£o da action.
+
+## V√≠deo 7.6 - Explicando Arquivo de Workflow do GitHub Actions
+
+1. Abrir pasta \.github\workflows
+2. Abrir arquivo de workflow
+
+-----------
+
+O que √© este arquivo?
+Este √© um arquivo de workflow do GitHub Actions. Ele automatiza o processo de build e deploy de uma Azure Function App .NET sempre que h√° um push para o branch.
 ---
-Disparando o Workflow
 
-```yml
+# Explica√ß√£o do Workflow do GitHub Actions
+
+## Nome e Gatilho
+```yaml
+name: Build and deploy dotnet core project to Azure Function App - VollMedFunctionApp20251025111641
+
 on:
   push:
     branches:
-    - Aula7
+      - main
+  workflow_dispatch:
 ```
+- **O que faz**: Define o nome do workflow e quando ele ser√° executado
+- **Quando roda**: Quando h√° um push na branch main ou manualmente atrav√©s do GitHub
 
-ExplicaÁ„o:
-O workflow È iniciado automaticamente toda vez que alguÈm faz um push de cÛdigo para o branch Aula7 do repositÛrio.
----
-Vari·veis de Ambiente
-
-```yml
+## Vari√°veis de Ambiente
+```yaml
 env:
-  AZURE_FUNCTIONAPP_NAME: VollMedFunctionApp20250826204006
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: VollMed.FunctionApp/published
-  CONFIGURATION: Release
-  DOTNET_CORE_VERSION: 9.0.x
-  WORKING_DIRECTORY: VollMed.FunctionApp
-  DOTNET_CORE_VERSION_INPROC: 6.0.x
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
+  DOTNET_VERSION: '9.0.x'
 ```
+- **O que faz**: Define vari√°veis de ambiente que ser√£o usadas em todo o workflow
+- **Configura√ß√µes**:
+  - Caminho do projeto: raiz do reposit√≥rio
+  - Vers√£o do .NET: 9.0.x
 
-ExplicaÁ„o:
-Essas vari·veis definem configuraÁıes importantes, como o nome da Function App no Azure, o caminho onde os arquivos publicados ser„o armazenados, a configuraÁ„o de build (Release) e as versıes do .NET utilizadas.
----
-Jobs: Build e Deploy
-O workflow possui dois jobs principais: build e deploy.
----
-1. Job de Build
-
-```yml
+## Configura√ß√£o do Job
+```yaml
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
+    permissions:
+      id-token: write
+      contents: read
 ```
+- **O que faz**: Define onde o workflow vai rodar e suas permiss√µes
+- **Onde roda**: Ubuntu mais recente
+- **Permiss√µes**: Permite escrever tokens e ler conte√∫do
 
-ExplicaÁ„o:
-O job de build roda em um servidor Ubuntu fornecido pelo GitHub. O primeiro passo faz o checkout do seu cÛdigo para que o workflow possa acess·-lo.
----
-Configurar o SDK do .NET
+## Passos do Workflow
 
-```yml
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-    - name: Setup .NET Core (for inproc extensions)
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION_INPROC }}
-        include-prerelease: True
+### 1. Checkout do C√≥digo
+```yaml
+- name: 'Checkout GitHub Action'
+  uses: actions/checkout@v4
 ```
+- **O que faz**: Baixa o c√≥digo do reposit√≥rio para o runner
 
-## IMPORTANTE: colocar o @ acima, substituindo setup-dotnetv4 por setup-dotnet@v4
-
-
-ExplicaÁ„o:
-Este passo instala o SDK do .NET 9, necess·rio para compilar o projeto.
----
-Restaurar DependÍncias
-
-```yml
-    - name: Restore
-      run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
+### 2. Configura√ß√£o do .NET
+```yaml
+- name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+  uses: actions/setup-dotnet@v1
 ```
+- **O que faz**: Instala o .NET na vers√£o especificada
 
-ExplicaÁ„o:
-Restaura todos os pacotes NuGet (bibliotecas externas) que o projeto precisa.
----
-Compilar o Projeto
-
-```yml
-    - name: Build
-      run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
+### 3. Build do Projeto
+```yaml
+- name: 'Resolve Project Dependencies Using Dotnet'
+  shell: bash
+  run: |
+    pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+    dotnet build --configuration Release --output ./output
+    popd
 ```
+- **O que faz**: Compila o projeto em modo Release
 
-ExplicaÁ„o:
-Compila o cÛdigo na pasta especificada usando a configuraÁ„o Release.
----
-Publicar o Projeto
-
-```yml
-    - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+### 4. Login no Azure
+```yaml
+- name: Login to Azure
+  uses: azure/login@v2
+  with:
+    client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FEBA8B95D65C4DBC9923EDCD20EFDE2B }}
+    tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_31E18847E6E4497080BCE191803499BE }}
+    subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_698A82C58D634E2E96A1365B064A3248 }}
 ```
+- **O que faz**: Faz login no Azure usando as credenciais do Service Principal
 
-ExplicaÁ„o:
-Prepara o cÛdigo compilado para o deploy, publicando os arquivos em uma pasta.
----
-Salvar os Artefatos do Build
-
-```yml
-    - name: Publish Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: functionapp
-        path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-        include-hidden-files: true
+### 5. Deploy da Function
+```yaml
+- name: 'Run Azure Functions Action'
+  uses: Azure/functions-action@v1
+  id: fa
+  with:
+    app-name: 'VollMedFunctionApp20251025111641'
+    slot-name: 'Production'
+    package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
 ```
+- **O que faz**: Faz o deploy do c√≥digo compilado para a Azure Function
+- **Destino**: Slot de produ√ß√£o da Function App
 
-## IMPORTANTE: A LINHA `include-hidden-files: true` ACIMA DEVE SER INCLUÕDA, CASO CONTR¡RIO O CI/CD N√O IR¡ ENCONTRAR NEM PUBLICAR AS FUN«’ES!
-
-ExplicaÁ„o:
-Salva os arquivos publicados para serem usados no prÛximo job (deploy).
----
-2. Job de Deploy
-
-```yml
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-```
-
-ExplicaÁ„o:
-O job de deploy tambÈm roda em Ubuntu e sÛ comeÁa apÛs o job de build terminar.
----
-Baixar os Artefatos do Build
-
-```yml
-    steps:
-    - name: Download artifact from build job
-      uses: actions/download-artifact@v4
-      with:
-        name: functionapp
-        path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-```
-
-ExplicaÁ„o:
-Recupera os arquivos publicados do job de build.
----
-Login no Azure
-
-
-```yml
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        creds: ${{ secrets.VollMedFunctionApp20250826204006_SPN }}
-```
-
-ExplicaÁ„o:
-Realiza o login no Azure usando uma credencial segura armazenada nos secrets do GitHub.
----
-Deploy na Azure Function App
-
-```yml
-    - name: Deploy to Azure Function App
-      uses: Azure/functions-action@v1
-      with:
-        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-```
-
-ExplicaÁ„o:
-Envia e publica os arquivos para a Function App especificada no Azure.
-
-### Publicar as Environment Variables no Azure Function App no portal do Azure
-
-```console
-"ServiceBusConnection": "Endpoint=***",
-"SqlConnectionString": "Server=tcp:vollmed2025***",
-"AzureCosmosDB_DatabaseName": "vollmed",
-"AzureCosmosDB_ContainerName": "resultadosmensais",
-"AzureCosmosDB_ConnectionString": "AccountEndpoint=***;"
-```
-
----
-Resumo
-ï	Job de build: Faz checkout do cÛdigo, configura o .NET, restaura dependÍncias, compila, publica e salva os arquivos.
-ï	Job de deploy: Baixa os arquivos publicados, faz login no Azure e realiza o deploy da aplicaÁ„o.
-ï	Publicar as Environment Variables no Azure Function App no portal do Azure
-
-Este workflow automatiza o processo de build e deploy da sua Azure Function App, evitando que vocÍ precise fazer tudo manualmente a cada atualizaÁ„o de cÛdigo.
+## Resumo
+Este workflow automatiza:
+1. Compila√ß√£o do c√≥digo
+2. Autentica√ß√£o no Azure
+3. Deploy na Azure Function
+4. Tudo isso acontece automaticamente a cada push na main
