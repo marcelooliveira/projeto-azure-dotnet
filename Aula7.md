@@ -219,3 +219,263 @@ Este workflow automatiza:
 2. Autenticação no Azure
 3. Deploy na Azure Function
 4. Tudo isso acontece automaticamente a cada push na main
+
+
+
+
+
+
+
+
+
+
+
+## Vídeo 7.7 - Infraestrutura como Código com Terraform
+
+**Título:**
+Publicando a Function App como código com Terraform
+
+---
+
+**C (Contexto)**
+
+  No último vídeo, vimos como publicar a Function App via GitHub Actions. Isso automatiza o deploy do código da nossa aplicação, eliminando a necessidade de publicar manualmente pelo Visual Studio.
+ 
+**P (Problema)**
+
+* Mas e quanto à infraestrutura?
+* Hoje, criar recursos manualmente no portal é lento
+* É difícil garantir o mesmo ambiente entre times
+* Além disso, as mudanças realizadas no portal não ficam registradas no controle de versão
+
+**S (Solução)**
+
+* Felizmente, existe temos a infraestrutura com Código (IaC)
+* Com ela, podemos automatizar a criação e configuração no Azure
+
+
+--
+
+## Estrutura de pastas
+
+```
+terraform/
+ ├── provider.tf
+ ├── variables.tf
+ ├── main.tf
+ └── outputs.tf
+```
+
+Rode os comandos abaixo para criar a infraestrutura:
+
+```
+REM Cria a pasta principal
+mkdir terraform
+
+REM Entra na pasta
+cd terraform
+
+REM Cria os arquivos vazios
+type nul > provider.tf
+type nul > variables.tf
+type nul > main.tf
+type nul > outputs.tf
+```
+
+
+---
+
+## **provider.tf**
+
+Configura o provedor do Azure e a versão mínima do Terraform.
+
+```hcl
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+
+  subscription_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  tenant_id       = "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
+}
+```
+
+---
+
+## **variables.tf**
+
+Define variáveis reutilizáveis com valores padrão.
+
+```hcl
+variable "resource_group_name" {
+  description = "Nome do Resource Group"
+  default     = "rg-vollmed-functionapp"
+}
+
+variable "location" {
+  description = "Região do Azure"
+  default     = "eastus2"
+}
+
+variable "storage_account_name" {
+  description = "Nome da Storage Account (somente minúsculas e números)"
+  default     = "vollmedfuncstorage"
+}
+
+variable "function_app_name" {
+  description = "Nome da Azure Function"
+  default     = "vollmed-functionapp"
+}
+
+variable "app_service_plan_name" {
+  description = "Nome do App Service Plan"
+  default     = "plan-vollmed-linux"
+}
+```
+
+---
+
+## **main.tf**
+
+Cria os recursos principais para a Function App em Linux.
+
+```hcl
+# Cria o Resource Group
+resource "azurerm_resource_group" "rg" {
+  name     = var.resource_group_name
+  location = var.location
+}
+
+# Cria a Storage Account (requisito da Function App)
+resource "azurerm_storage_account" "storage" {
+  name                     = var.storage_account_name
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+# Cria o App Service Plan no modo consumo (Linux)
+resource "azurerm_service_plan" "plan" {
+  name                = var.app_service_plan_name
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  os_type             = "Linux"
+  sku_name            = "Y1"
+}
+
+# Cria a Function App (Linux)
+resource "azurerm_linux_function_app" "functionapp" {
+  name                       = var.function_app_name
+  resource_group_name        = azurerm_resource_group.rg.name
+  location                   = azurerm_resource_group.rg.location
+  service_plan_id            = azurerm_service_plan.plan.id
+  storage_account_name       = azurerm_storage_account.storage.name
+  storage_account_access_key = azurerm_storage_account.storage.primary_access_key
+
+  site_config {
+    application_stack {
+      dotnet_version = "8.0"
+    }
+  }
+
+  app_settings = {
+    "FUNCTIONS_WORKER_RUNTIME"    = "dotnet-isolated"
+    "FUNCTIONS_EXTENSION_VERSION" = "~4"
+    "AzureWebJobsStorage"         = azurerm_storage_account.storage.primary_connection_string
+  }
+}
+```
+
+---
+
+## **outputs.tf**
+
+Mostra informações úteis após a criação.
+
+```hcl
+output "function_app_name" {
+  value = azurerm_linux_function_app.functionapp.name
+}
+
+output "function_app_url" {
+  value = "https://${azurerm_linux_function_app.functionapp.default_hostname}"
+}
+
+output "resource_group" {
+  value = azurerm_resource_group.rg.name
+}
+```
+
+## Pré-requisitos
+
+Abra o terminal e instale o Terraform e o Azure CLI:
+
+```
+winget install HashiCorp.Terraform
+msiexec /i https://aka.ms/installazurecliwindows
+```
+
+Agora rode os comandos para autenticar no Azure, pegar o Tenant ID e Subscription ID:
+
+```
+az login
+az account show --query tenantId -o tsv
+```
+
+Com os valores de Tenant ID e Subscription ID, edite o arquivo `provider.tf` e substitua os valores:
+```hcl
+  subscription_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  tenant_id       = "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
+```
+
+---
+
+## **Comandos Linux para execução**
+
+Abra o terminal na pasta `terraform/` e execute:
+
+```bash
+# Inicializa o Terraform e baixa os provedores necessários
+terraform init
+
+O comando acima prepara o ambiente Terraform, baixando os plugins necessários para interagir com o Azure.
+
+# Visualiza o plano de criação dos recursos
+terraform plan
+
+Esse comando anterior mostra o que será criado no Azure, sem fazer alterações ainda. É uma etapa importante para revisar antes de aplicar as mudanças.
+
+# Aplica o plano e cria os recursos no Azure
+terraform apply
+
+Esse comando final cria efetivamente os recursos no Azure conforme definido nos arquivos .tf.
+
+# Exibe os valores de saída após o deploy
+```
+
+---
+
+## **Para destruir todos os recursos**
+
+Se quiser remover tudo criado no Azure, basta rodar:
+
+```bash
+terraform destroy
+```
+
+* Terraform é uma ferramenta de IaC, que usa usa arquivos `.tf` para definir recursos de nuvem, como Function App, Storage e App Service Plan
+* O IaC garante **consistência, reprodutibilidade e rastreabilidade** da infraestrutura
+* Com o Terraform, toda a infraestrutura — Function App, Storage Account, App Service Plan — é descrita em código.
+* Isso elimina a criação manual de recursos e reduz erros humanos.
+* O código do Terraform pode ser versionado junto com o projeto no GitHub.
+* O resultado é uma implantação previsível, automatizada e fácil de reproduzir em outros ambientes.
